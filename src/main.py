@@ -1,7 +1,9 @@
-from assembler import Assembler2
+from pathlib import Path
 import argparse
 import logging
 import sys
+
+from assembler import Assembler
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -16,8 +18,13 @@ if __name__ == '__main__':
         help='Show debug output.',
         action='store_const', dest='level', const=logging.DEBUG)
 
+    parser.add_argument(
+        'file',
+        help='File to assemble',
+        type=argparse.FileType('r', encoding='UTF-8'))
+
     args = parser.parse_args()
-    
+
     # If neither verbose mode or debug mode are used, the default
     # log level is `logging.WARNING`.  
     logging.basicConfig(
@@ -26,11 +33,19 @@ if __name__ == '__main__':
         datefmt='%Y-%m-%d %H:%M:%S',
         level=args.level)
 
-    asm = assembler.Assembler()
-    asm.assemble('hello')
-    
-    # TODO: Take another argument, the assembly file
-    # to generate machine code for.
+    assembler = Assembler()
 
-    # TODO: Read the contents of the file and pass it to
-    # some function in the `assembly` module. 
+    try:
+        data = assembler.assemble(args.file.readlines())
+        destination = f'{Path(args.file.name).stem}.dat'
+
+        with open(destination, 'wb') as output:
+            for byte in data:
+                output.write(byte)
+            
+            description = 'byte' if len(data) == 0 else 'bytes'
+            logging.debug(f'Writing {len(data)*4} {description} to {destination}')
+
+    except Exception as e:
+        logging.error(e)
+    
