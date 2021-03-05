@@ -1,9 +1,10 @@
 from pathlib import Path
+from hexdump import dump
 import argparse
 import logging
 import sys
 
-from assembler import Assembler
+from assembler import Assembler, AssemblyError
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -20,7 +21,12 @@ if __name__ == '__main__':
 
     parser.add_argument(
         '-c', '--check',
-        help='Assemble the file without writing it to disk.',
+        help='Assemble the project without writing the produced result to disk.',
+        action='store_true')
+
+    parser.add_argument(
+        '-s', '--stdout',
+        help='Assemble the file and print the result to stdout.',
         action='store_true')
 
     parser.add_argument(
@@ -39,20 +45,18 @@ if __name__ == '__main__':
         level=args.level)
 
     assembler = Assembler()
+    data = assembler.assemble(args.file.readlines())
+    destination = f'{Path(args.file.name).stem}.dat'
 
-    try:
-        data = assembler.assemble(args.file.readlines())
-        destination = f'{Path(args.file.name).stem}.dat'
+    #description = 'byte' if len(data) == 1 else 'bytes'
+    #logging.debug(f'Writing {len(data)*4} {description} to {destination}')
 
-        description = 'byte' if len(data) == 1 else 'bytes'
-        logging.debug(f'Writing {len(data)*4} {description} to {destination}')
-
-        if args.check:
-            logging.debug(f'{data}')
+    if not args.check:
+        if args.stdout:
+            sys.stdout.buffer.write(data)
         else:
             with open(destination, 'wb') as output:
                 for byte in data:
-                    output.write(byte)         
+                    output.write(data)   
 
-    except Exception as e:
-        logging.error(e)
+
