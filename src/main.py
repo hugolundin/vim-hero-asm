@@ -19,6 +19,11 @@ if __name__ == '__main__':
         action='store_const', dest='level', const=logging.DEBUG)
 
     parser.add_argument(
+        '-c', '--check',
+        help='Assemble the file without writing it to disk.',
+        action='store_true')
+
+    parser.add_argument(
         'file',
         help='File to assemble',
         type=argparse.FileType('r', encoding='UTF-8'))
@@ -39,13 +44,15 @@ if __name__ == '__main__':
         data = assembler.assemble(args.file.readlines())
         destination = f'{Path(args.file.name).stem}.dat'
 
-        with open(destination, 'wb') as output:
-            for byte in data:
-                output.write(byte)
-            
-            description = 'byte' if len(data) == 0 else 'bytes'
-            logging.debug(f'Writing {len(data)*4} {description} to {destination}')
+        description = 'byte' if len(data) == 1 else 'bytes'
+        logging.debug(f'Writing {len(data)*4} {description} to {destination}')
+
+        if args.check:
+            logging.debug(f'{data}')
+        else:
+            with open(destination, 'wb') as output:
+                for byte in data:
+                    output.write(byte)         
 
     except Exception as e:
         logging.error(e)
-    

@@ -3,13 +3,11 @@ from passes import remove_whitespace
 class Assembler:
     def __init__(self):
         self.result = []
-        self.transformations = [
-            remove_whitespace
-        ]
+        self.passes = [remove_whitespace]
 
     def assemble(self, lines):
-        for transformation in self.transformations:
-            self.result = transformation(self.result)
+        for _pass in self.passes:
+            self.result = _pass(self.result)
 
         self.result.append(0xFFFFFFFF)
         self.result.append(0xABCDEFAB)
