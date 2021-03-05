@@ -1,5 +1,4 @@
 from pathlib import Path
-from hexdump import dump
 import argparse
 import logging
 import sys
@@ -48,15 +47,13 @@ if __name__ == '__main__':
     data = assembler.assemble(args.file.readlines())
     destination = f'{Path(args.file.name).stem}.dat'
 
-    #description = 'byte' if len(data) == 1 else 'bytes'
-    #logging.debug(f'Writing {len(data)*4} {description} to {destination}')
-
     if not args.check:
         if args.stdout:
             sys.stdout.buffer.write(data)
         else:
-            with open(destination, 'wb') as output:
-                for byte in data:
-                    output.write(data)   
+            description = 'byte' if len(data) == 1 else 'bytes'
+            logging.debug(f'Writing {len(data)} {description} to {destination}')
 
+            with open(destination, 'wb') as output:
+                output.write(data)
 
