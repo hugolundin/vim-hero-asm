@@ -43,8 +43,8 @@ if __name__ == '__main__':
         datefmt='%Y-%m-%d %H:%M:%S',
         level=args.level)
 
-    assembler = Assembler()
-    data = assembler.assemble(args.file.readlines())
+    assembler = Assembler(args.file.readlines())
+    data = assembler.assemble()
     destination = f'{Path(args.file.name).stem}.dat'
 
     if not args.check:
