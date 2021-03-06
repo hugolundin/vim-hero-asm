@@ -1,3 +1,9 @@
+from bitarray import bitarray
+
+class InstructionBuilder:
+    def __init__(self):
+        self.data = bitarray()
+        self.data.extend('0b10010')
 
 class MachineCodeBuilder:
     def __init__(self):
