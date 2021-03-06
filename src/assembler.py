@@ -1,24 +1,26 @@
-from passes import remove_whitespace
-from machine_code import MachineCodeBuilder
+from bitarray import bitarray
+from instructions import Instruction
 
 class AssemblyError(Exception):
     """Raised when an error occurs during assembly."""
     pass
 
-
 class Assembler:
-    def __init__(self, lines):
+    def __init__(self):
         self.pc = 0
         self.labels = {}
         self.instructions = []
-        self.passes = [remove_whitespace]
-        self.builder = MachineCodeBuilder()
-        self.lines = [line for line in [line.strip() for line in lines] if line]
+        self.result = bitarray()
 
-    def label(self, token) -> str:
+    @staticmethod
+    def remove_whitespace(lines):
+        return [line for line in [line.strip() for line in lines] if line]
+
+    @staticmethod
+    def label(token) -> str:
         return token if token[-1] == ':' else None
 
-    def tokenize(self, line, lc) -> (str, list[str]):
+    def tokenize(self, line, line_number) -> (str, list[str]):
         tokens = line.split(' ')
 
         if not tokens:
@@ -29,20 +31,23 @@ class Assembler:
 
         return (None, tokens)
 
-    def assemble(self) -> bytearray:
-        for line, line in enumerate(self.lines):
-            label, instruction = self.tokenize(line, index)
+    def assemble(self, lines) -> bytes:
+        lines = self.remove_whitespace(lines)
+
+        for line_number, line in enumerate(lines):
+            label, tokens = self.tokenize(line, line_number)
             
-            if instruction:
+            if tokens:
                 self.pc += 1
-                self.instructions.append((index, instruction))
+                self.instructions.append(Instruction(tokens, line_number))
 
             if label:
                 self.labels[label] = self.pc
 
-        print(self.labels)
-
         for instruction in self.instructions:
-            print(instruction)
+            self.result.extend(instruction.assemble())
+
+        return self.result.tobytes()
         
-        return self.builder.get_machine_code()
+
+
