@@ -1,4 +1,1 @@
-ld
-nop
-nop
-ldi
+ld r0,r1

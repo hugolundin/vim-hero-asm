@@ -1,5 +1,5 @@
 from bitarray import bitarray
-from instructions import Instruction
+from arch import INSTRUCTIONS, REGISTERS
 
 class AssemblyError(Exception):
     """Raised when an error occurs during assembly."""
@@ -20,8 +20,8 @@ class Assembler:
     def label(token) -> str:
         return token if token[-1] == ':' else None
 
-    def tokenize(self, line, line_number) -> (str, list[str]):
-        tokens = line.split(' ')
+    def parse_label(self, line) -> (str, list[str]):
+        tokens = line.replace(' ', ',').split(',')
 
         if not tokens:
             return (None, None)
@@ -31,21 +31,32 @@ class Assembler:
 
         return (None, tokens)
 
+    def parse_instruction(self, tokens):
+        if not tokens:
+            raise Exception('Invalid tokens.')
+
+        instruction, *arguments = tokens
+
+        return instruction, arguments
+
     def assemble(self, lines) -> bytes:
         lines = self.remove_whitespace(lines)
 
-        for line_number, line in enumerate(lines):
-            label, tokens = self.tokenize(line, line_number)
-            
+        for line in lines:
+            label, tokens = self.parse_label(line)
+
             if tokens:
                 self.pc += 1
-                self.instructions.append(Instruction(tokens, line_number))
+                self.instructions.append(tokens)
 
             if label:
                 self.labels[label] = self.pc
 
-        for instruction in self.instructions:
-            self.result.extend(instruction.assemble())
+        for tokens in self.instructions:
+            op, arguments = self.parse_instruction(tokens)
+
+            if instruction := INSTRUCTIONS.get(op):
+                self.result.extend(instruction.assemble(arguments))
 
         return self.result.tobytes()
         
