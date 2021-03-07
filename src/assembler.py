@@ -1,5 +1,5 @@
 from bitarray import bitarray
-from arch import INSTRUCTIONS, REGISTERS
+from arch import Architecture
 
 class AssemblyError(Exception):
     """Raised when an error occurs during assembly."""
@@ -11,6 +11,7 @@ class Assembler:
         self.labels = {}
         self.instructions = []
         self.result = bitarray()
+        self.architecture = Architecture()
 
     @staticmethod
     def remove_whitespace(lines):
@@ -55,7 +56,7 @@ class Assembler:
         for tokens in self.instructions:
             op, arguments = self.parse_instruction(tokens)
 
-            if instruction := INSTRUCTIONS.get(op):
+            if instruction := self.architecture.instructions.get(op):
                 self.result.extend(instruction.assemble(arguments))
 
         return self.result.tobytes()
