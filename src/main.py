@@ -4,6 +4,7 @@ import logging
 import sys
 
 from assembler import Assembler, AssemblyError
+from architecture import Architecture
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -43,7 +44,12 @@ if __name__ == '__main__':
         datefmt='%Y-%m-%d %H:%M:%S',
         level=args.level)
 
-    assembler = Assembler()
+    architecture = Architecture(
+        'arch/instructions.csv',
+        'arch/registers.csv'
+    )
+
+    assembler = Assembler(architecture)
     data = assembler.assemble(args.file.readlines())
     destination = f'{Path(args.file.name).stem}.dat'
 
