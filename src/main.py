@@ -3,6 +3,7 @@ import argparse
 import logging
 import sys
 
+from utilities import description
 from assembler import Assembler, AssemblyError
 from architecture import registers, instructions
 
@@ -50,10 +51,9 @@ if __name__ == '__main__':
 
     if not args.check:
         if args.stdout:
-            sys.stdout.buffer.write(data)
+            sys.stdout.buffer.write(data.tobytes())
         else:
-            description = 'byte' if len(data) == 1 else 'bytes'
-            logging.debug(f'Writing {len(data)} {description} to {destination}')
+            logging.debug(f'Writing {description(data)} to {destination}')
 
             with open(destination, 'wb') as output:
                 output.write(data)

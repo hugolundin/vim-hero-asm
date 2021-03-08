@@ -1,3 +1,4 @@
+import re
 from bitarray import bitarray
 
 class AssemblyError(Exception):
@@ -35,13 +36,18 @@ class Assembler:
         return (None, tokens)
 
     def tokenize(self, lines: list[str]) -> list[str]:
-        clean_lines = [line for line in [line.strip() for line in lines] if line]
-        tokenized = [line.replace(' ', ',').split(',') for line in clean_lines]
-        return tokenized
+        result = []
 
-    def assemble(self, lines) -> bytes:
+        for line in lines:
+            result.append([t for t in re.split(',| ', line) if t])
+
+        return result
+
+    def assemble(self, lines) -> bitarray:
         instructions = []
         tokens = self.tokenize(lines)
+
+        # print(tokens)
 
         for line in tokens:
             label, instruction = self.parse_label(line)
@@ -59,7 +65,8 @@ class Assembler:
             if assembler := self.instructions.get(op):
                 self.result.extend(assembler.assemble(arguments))
 
-        return self.result.tobytes()
+        print(self.result)
+        return self.result
         
 
 

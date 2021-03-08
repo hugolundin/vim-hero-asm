@@ -13,7 +13,7 @@ class Instruction:
         for builder in self.builders:
             if builder := builder:
                 argument, *arguments = arguments
-                builder(argument, result)
+                builder(result, argument)
 
         padding = INSTRUCTION_LEN - len(result)
         result.extend('0'*padding)
