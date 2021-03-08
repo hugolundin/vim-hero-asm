@@ -6,7 +6,7 @@ class AssemblyError(Exception):
     pass
 
 class Assembler:
-    def __init__(self, registers, instructions):
+    def __init__(self, registers=[], instructions=[]):
         self.pc = 0
         self.labels = {}
         self.registers = registers
@@ -19,6 +19,8 @@ class Assembler:
 
         label, *tail = tokens
 
+        print(label)
+
         if label[-1] == ':':
             return (label, tail)
 
@@ -29,35 +31,39 @@ class Assembler:
             return (None, None)
 
         op, *tail = tokens
-
+        
         if op in self.instructions:
             return (op, tail)
 
         return (None, tokens)
 
-    def tokenize(self, lines: list[str]) -> list[str]:
-        result = []
+    def parse(self, line: str) -> (str, str, list[str]):
+        s = line.strip()
 
-        for line in lines:
-            result.append([t for t in re.split(',| ', line) if t])
+        
+        label, *tail = self.parse_label(s.split(' ', 1))
 
-        return result
+        print(tail)
+
+        op, *arguments = self.parse_op(tail)
+
+        return (label, op, arguments)
 
     def assemble(self, lines) -> bitarray:
         instructions = []
-        tokens = self.tokenize(lines)
 
-        # print(tokens)
+        for line in lines:
+            label, op, *arguments = self.parse(line)
 
-        for line in tokens:
-            label, instruction = self.parse_label(line)
-
-            if tokens:
+            if op:
                 self.pc += 1
                 instructions.append(instruction)
 
             if label:
                 self.labels[label] = self.pc
+
+        print(instructions)
+        print(labels)
 
         for instruction in instructions:
             op, arguments = self.parse_op(instruction)
