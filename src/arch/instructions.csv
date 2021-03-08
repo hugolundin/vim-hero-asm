@@ -1,3 +1,0 @@
-nop | 111111 |          |
-ld  | 111111 | reg, reg |
-ldi | 111111 | reg, imm |

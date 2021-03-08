@@ -1,63 +1,63 @@
 from bitarray import bitarray
-from architecture import Architecture
 
 class AssemblyError(Exception):
     """Raised when an error occurs during assembly."""
     pass
 
 class Assembler:
-    def __init__(self, arch):
+    def __init__(self, registers, instructions):
         self.pc = 0
         self.labels = {}
-        self.arch = arch
-        self.instructions = []
+        self.registers = registers
+        self.instructions = instructions
         self.result = bitarray()
 
-    @staticmethod
-    def remove_whitespace(lines):
-        return [line for line in [line.strip() for line in lines] if line]
-
-    @staticmethod
-    def label(token) -> str:
-        return token if token[-1] == ':' else None
-
-    def parse_label(self, line) -> (str, list[str]):
-        tokens = line.replace(' ', ',').split(',')
-
+    def parse_label(self, tokens: list[str]) -> (str, list[str]):
         if not tokens:
             return (None, None)
 
-        if label := self.label(tokens[0]):
-            return (label, tokens[1:])
+        label, *tail = tokens
+
+        if label[-1] == ':':
+            return (label, tail)
 
         return (None, tokens)
 
-    def parse_instruction(self, tokens):
+    def parse_op(self, tokens: list[str]) -> (str, list[str]):
         if not tokens:
-            raise Exception('Invalid tokens.')
+            return (None, None)
 
-        instruction, *arguments = tokens
+        op, *tail = tokens
 
-        return instruction, arguments
+        if op in self.instructions:
+            return (op, tail)
+
+        return (None, tokens)
+
+    def tokenize(self, lines: list[str]) -> list[str]:
+        clean_lines = [line for line in [line.strip() for line in lines] if line]
+        tokenized = [line.replace(' ', ',').split(',') for line in clean_lines]
+        return tokenized
 
     def assemble(self, lines) -> bytes:
-        lines = self.remove_whitespace(lines)
+        instructions = []
+        tokens = self.tokenize(lines)
 
-        for line in lines:
-            label, tokens = self.parse_label(line)
+        for line in tokens:
+            label, instruction = self.parse_label(line)
 
             if tokens:
                 self.pc += 1
-                self.instructions.append(tokens)
+                instructions.append(instruction)
 
             if label:
                 self.labels[label] = self.pc
 
-        for tokens in self.instructions:
-            op, arguments = self.parse_instruction(tokens)
+        for instruction in instructions:
+            op, arguments = self.parse_op(instruction)
 
-            if instruction := self.arch.instructions.get(op):
-                self.result.extend(instruction.assemble(arguments))
+            if assembler := self.instructions.get(op):
+                self.result.extend(assembler.assemble(arguments))
 
         return self.result.tobytes()
         

@@ -1,80 +1,50 @@
-import csv
-from bitarray import bitarray
+from instruction import Instruction
+from register import Register
 
-INSTRUCTION_LEN = 32
-ARGUMENT_REGISTER = 'reg'
-ARGUMENT_IMMEDIATE = 'imm'
+registers = {
+    'r0'    : '00000',
+    'r1'    : '00000',
+    'r2'    : '00000',
+    'r3'    : '00000',
+    'r4'    : '00000',
+    'r5'    : '00000',
+    'r6'    : '00000',
+    'r7'    : '00000',
+    'r8'    : '00000',
+    'r9'    : '00000',
+    'r10'   : '00000',
+    'r11'   : '00000',
+    'r12'   : '00000',
+    'r13'   : '00000',
+    'r14'   : '00000',
+    'r15'   : '00000',
+    'r16'   : '00000',
+    'r17'   : '00000',
+    'r18'   : '00000',
+    'r19'   : '00000',
+    'r20'   : '00000',
+    'r21'   : '00000',
+    'r22'   : '00000',
+    'r23'   : '00000',
+    'r24'   : '00000',
+    'r25'   : '00000',
+    'r26'   : '00000',
+    'pc'    : '00000',
+    'sp'    : '00000',
+    'flags' : '00000'
+}
 
-class Instruction:
-    def __init__(self, op, builders):
-        self.op = bitarray(op)
-        self.builders = builders
+def reg(argument, result):
+    if register := registers.get(argument):
+        result.extend(register)
 
-    def assemble(self, arguments) -> bitarray:
-        result = bitarray(self.op)
+def imm(argument, result):
+    pass
 
-        for builder in self.builders:
-            if builder := builder:
-                argument, *arguments = arguments
-                builder(argument, result)
-
-        padding = INSTRUCTION_LEN - len(result)
-        result.extend('0'*padding)
-
-        return result
-
-class Architecture:
-    def __init__(self, instructions, registers):
-        self.registers = self.read_registers(registers)
-        self.instructions = self.read_instructions(instructions)
-
-    @staticmethod
-    def read_instructions(source):
-        result = {}
-
-        with open(source, 'r') as csv_file:
-            reader = csv.reader(csv_file, delimiter='|')
-
-            for instruction in reader:
-                name = instruction[0].strip()
-                op = instruction[1].strip()
-                arguments = instruction[2].strip().split(',')
-                builders = []
-
-                for argument in arguments:
-                    if argument is ARGUMENT_REGISTER:
-                        builders.append(self.register)
-                    elif argument is ARGUMENT_IMMEDIATE:
-                        builders.append(self.argument)
-                    else:
-                        # TODO: Do something smart
-                        continue
-
-                result[name] = Instruction(op, builders)
-
-        return result
-
-    @staticmethod
-    def read_registers(source):
-        result = {}
-
-        with open(source, 'r') as csv_file:
-            reader = csv.reader(csv_file, delimiter='|')
-
-            for instruction in reader:
-                name = instruction[0]
-                code = instructions[1]
-                result[name] = bitarray(code)
-
-        return result
-                
-    def valid_register(self, r: str) -> bool:
-        return r in self.registers
-
-    def register(self, argument, result):
-        if coding := self.registers.get(argument):
-            result.extend(coding)
-
-    def immediate(self, argument, result):
-        pass
-
+instructions = {
+    'nop'  : Instruction('000000'),
+    'ld'   : Instruction('000001', reg, reg),
+    'ldi'  : Instruction('000010', reg, imm),
+    'cmp'  : Instruction('000011', reg, reg),
+    'cmpi' : Instruction('000011', reg, imm)
+}
