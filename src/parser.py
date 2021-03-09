@@ -1,89 +1,64 @@
-from lark import Lark
-from lark import Transformer
-from lark.exceptions import UnexpectedCharacters
+class Token:
+    def __init__(self):
+        self.label = None
+        self.op = None
+        self.args = []
 
-class LineTransformer(Transformer):
-    def assert_empty(self, var):
-        if var:
-            raise Exception('Invalid line parsed. ')
+    def __repr__(self):
+        return f'label={self.label}, op={self.op}, args={self.args}'   
+
+def erase_comment(line):
+    if not line:
+        return None
+
+    s = line.split('#', 1)
+
+    if len(s) > 1:
+        return s[0]
+    else:
+        return line
+
+def parse_label(line):
+    if not line:
+        return (None, None)
+
+    s = line.split(':', 1)
+
+    if len(s) > 1:
+        return (s[0].strip(), s[1].strip())
+    else:
+        return (None, line)
+
+def parse_op(line):
+    if not line:
+        return (None, None)
+
+    s = line.split(' ', 1)
+
+    if len(s) > 1:
+        return (s[0].strip(), s[1].strip())
+    else:
+        return (s[0], None)
+
+def parse_args(line):
+    if not line:
+        return []
+
+    return [arg.strip() for arg in line.split(',')]
     
-    def start(self, tokens):
-        label = None
-        op = None
-        arguments = []
-        comment = None
-
-        for token in tokens:
-            if token.type == 'ARGUMENT':
-                arguments.append(token.value)
-            elif token.type == 'COMMENT':
-                self.assert_empty(comment)
-                comment = token.value
-            elif token.type == 'OP':
-                self.assert_empty(op)
-                op = token.value
-            elif token.type == 'LABEL':
-                self.assert_empty(label)
-                label = token.value
-            else:
-                raise Exception('Unknown token')
-
-        return (label, op, arguments, comment)
-
 def parse(line):
-    l = Lark("""
-    start: [LABEL ":"]  OP [ARGUMENT ["," ARGUMENT]*] [COMMENT]
+    t = Token()
 
-    LABEL: NAME
-    OP.1: NAME
-    ARGUMENT.2: VARIABLE
-            | DECIMAL
-            | HEXADECIMAL
-            | BINARY
+    tail = erase_comment(line)
+    t.label, tail = parse_label(tail)
+    t.op, tail = parse_op(tail)
+    t.args = parse_args(tail)
 
-    VARIABLE : NAME
-    DECIMAL.3 : DEC
-    HEXADECIMAL.3 : HEX
-    BINARY.3 : BIN
-    
-    %import common.CNAME -> NAME
-    %import python.COMMENT -> COMMENT
-    %import python.DEC_NUMBER -> DEC
-    %import python.HEX_NUMBER -> HEX
-    %import python.BIN_NUMBER -> BIN
-    %import common.WS
-    %ignore WS
-    """, parser='lalr')
-
-    try:
-        tree = l.parse(line)
-    except UnexpectedCharacters as e:
-        print(e)
-        exit(0)
-
-    return LineTransformer().transform(tree)
+    return t
 
 if __name__ == '__main__':
-    label, op, arguments, comment = parse('nop')
-
-    print(label, op, arguments, comment)
-
-# def parse(line):
-#     l = Lark(r"""
-#     line: [label] op [argument ("," argument)*] [comment]
-
-#     label: STRING ":"
-#     op: STRING
-#     argument: STRING
-#     comment: "#" STRING
-
-#     %import common.ESCAPED_STRING -> STRING
-#     %import common.WS
-#     %ignore WS
-#     """, start='line')
+    print(parse('nop'))
+    print(parse('ldi r0, 2 + 2* 3'))
+    print(parse('start: nop #blbablabla#hej'))
     
-#     return l.parse(line)
-
-# if __name__ == '__main__':
-#     print(parse('nop:'))
-#     # print(parse('bla: ldi r0, r1'))
+    
