@@ -1,8 +1,8 @@
 from simpleeval import simple_eval
 from bitarray.util import int2ba
 
-from instruction import Instruction
-from register import Register
+from asm_types.register import Register
+from asm_types.instruction import Instruction
 
 registers = {
     'r0'    : '11111',
