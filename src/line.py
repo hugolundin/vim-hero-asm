@@ -1,11 +1,11 @@
-class Line:
+class Token:
     def __init__(self):
         self.label = None
         self.op = None
         self.args = []
 
     def __repr__(self):
-        return f'label={self.label}, op={self.op}, args={self.args}'   
+        return f'label={self.label}, op={self.op}, args={self.args}'
 
 def erase_comment(line):
     if not line:
@@ -47,18 +47,16 @@ def parse_args(line):
     return [arg.strip() for arg in line.split(',')]
     
 def parse(line):
-    l = Line()
+    t = Token()
 
     tail = erase_comment(line)
-    l.label, tail = parse_label(tail)
-    l.op, tail = parse_op(tail)
-    l.args = parse_args(tail)
+    t.label, tail = parse_label(tail)
+    t.op, tail = parse_op(tail)
+    t.args = parse_args(tail)
 
-    return l
+    return t
 
 if __name__ == '__main__':
     print(parse('nop'))
     print(parse('ldi r0, 2 + 2* 3'))
     print(parse('start: nop #blbablabla#hej'))
-    
-    

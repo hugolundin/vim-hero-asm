@@ -51,7 +51,7 @@ if __name__ == '__main__':
 
     if not args.check:
         if args.stdout:
-            sys.stdout.buffer.write(data.tobytes())
+            sys.stdout.buffer.write(data)
         else:
             logging.debug(f'Writing {description(data)} to {destination}')
 

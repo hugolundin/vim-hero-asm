@@ -42,11 +42,9 @@ def reg(result, argument):
         result.extend(register)
 
 def imm(result, argument):
-    # TODO: Improve handling of spaces here... 
     value = simple_eval(argument)
-    result.extend(int2ba(value))
-    print('yello')
-    
+    result.extend(int2ba(value, length=16))
+    print(value)
 
 instructions = {
     'nop'  : Instruction('000000'),
@@ -55,3 +53,6 @@ instructions = {
     'cmp'  : Instruction('000011', reg, reg),
     'cmpi' : Instruction('000011', reg, imm)
 }
+
+
+# 000010 00010 00000 00000000 101 00000 00110101 00001010
