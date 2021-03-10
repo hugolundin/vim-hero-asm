@@ -41,18 +41,18 @@ def reg(result, argument):
     if register := registers.get(argument):
         result.extend(register)
 
-def imm(result, argument):
+def imm21(result, argument):
+    value = simple_eval(argument)
+    result.extend(int2ba(value, length=21))
+
+def imm16(result, argument):
     value = simple_eval(argument)
     result.extend(int2ba(value, length=16))
-    print(value)
 
 instructions = {
     'nop'  : Instruction('000000'),
     'ld'   : Instruction('000001', reg, reg),
-    'ldi'  : Instruction('000010', reg, imm),
+    'ldi'  : Instruction('111111', reg, imm21),
     'cmp'  : Instruction('000011', reg, reg),
-    'cmpi' : Instruction('000011', reg, imm)
+    'cmpi' : Instruction('000011', reg, imm16)
 }
-
-
-# 000010 00010 00000 00000000 101 00000 00110101 00001010
