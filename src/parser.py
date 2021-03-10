@@ -1,4 +1,4 @@
-class Token:
+class Line:
     def __init__(self):
         self.label = None
         self.op = None
@@ -47,14 +47,14 @@ def parse_args(line):
     return [arg.strip() for arg in line.split(',')]
     
 def parse(line):
-    t = Token()
+    l = Line()
 
     tail = erase_comment(line)
-    t.label, tail = parse_label(tail)
-    t.op, tail = parse_op(tail)
-    t.args = parse_args(tail)
+    l.label, tail = parse_label(tail)
+    l.op, tail = parse_op(tail)
+    l.args = parse_args(tail)
 
-    return t
+    return l
 
 if __name__ == '__main__':
     print(parse('nop'))
