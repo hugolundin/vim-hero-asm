@@ -1,8 +1,27 @@
 from simpleeval import simple_eval
 from bitarray.util import int2ba
+from bitarray import bitarray
+from line import Line
 
-from asm_types.register import Register
-from asm_types.instruction import Instruction
+INSTRUCTION_LEN = 32
+
+class Instruction:
+    def __init__(self, op, *builders):
+        self.op = bitarray(op)
+        self.builders = builders
+
+    def assemble(self, arguments, labels, pc) -> bitarray:
+        result = self.op.copy()
+
+        for builder in self.builders:
+            if builder := builder:
+                argument, *arguments = arguments
+                builder(result, argument, labels, pc)
+
+        padding = INSTRUCTION_LEN - len(result)
+        result.extend('0'*padding)
+
+        return result
 
 registers = {
     'r0'    : '11111',
@@ -37,22 +56,27 @@ registers = {
     'flags' : '00000'
 }
 
-def reg(result, argument):
+def reg(result, argument, labels, pc):
     if register := registers.get(argument):
         result.extend(register)
 
-def imm21(result, argument):
+def imm21(result, argument, labels, pc):
     value = simple_eval(argument)
     result.extend(int2ba(value, length=21))
 
-def imm16(result, argument):
+def imm16(result, argument, labels, pc):
     value = simple_eval(argument)
     result.extend(int2ba(value, length=16))
 
 instructions = {
-    'nop'  : Instruction('000000'),
-    'ld'   : Instruction('000001', reg, reg),
-    'ldi'  : Instruction('111111', reg, imm21),
-    'cmp'  : Instruction('000011', reg, reg),
-    'cmpi' : Instruction('000011', reg, imm16)
+    'nop'   : Instruction('000000'),
+    'ld'    : Instruction('000001', reg, reg),
+    'ldi'   : Instruction('111111', reg, imm21),
+    'cmp'   : Instruction('000011', reg, reg),
+    'cmpi'  : Instruction('000011', reg, imm16),
+    'jmpi'  : Instruction('000100', imm21)
+}
+
+transformers = {
+    'henak' : lambda args: Line(op='jmpi', args=['718'])
 }

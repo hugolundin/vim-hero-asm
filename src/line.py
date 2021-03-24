@@ -1,8 +1,8 @@
 class Line:
-    def __init__(self):
-        self.label = None
-        self.op = None
-        self.args = []
+    def __init__(self, label=None, op=None, args=[]):
+        self.label = label
+        self.op = op
+        self.args = args
 
     def __repr__(self):
         return f'label={self.label}, op={self.op}, args={self.args}'
@@ -46,7 +46,7 @@ def parse_args(line):
 
     return [arg.strip() for arg in line.split(',')]
     
-def parse(line):
+def parse_line(line):
     l = Line()
 
     tail = erase_comment(line)

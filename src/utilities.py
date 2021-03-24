@@ -1,7 +1,7 @@
 import sys
 
 def description(data):
-    length = len(data.tobytes())
+    length = len(data)
 
     if length == 1:
         return f'1 byte'

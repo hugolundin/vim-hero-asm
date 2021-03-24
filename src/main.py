@@ -5,7 +5,6 @@ import sys
 
 from utilities import description
 from assembler import Assembler, AssemblyError
-from architecture import registers, instructions
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -45,16 +44,15 @@ if __name__ == '__main__':
         datefmt='%Y-%m-%d %H:%M:%S',
         level=args.level)
 
-    assembler = Assembler(registers, instructions)
-    data = assembler.assemble(args.file.readlines())
+    assembler = Assembler()
+    data = assembler.assemble(args.file.read().split('\n'))
     destination = f'{Path(args.file.name).stem}.dat'
 
     if not args.check:
         if args.stdout:
             sys.stdout.buffer.write(data)
         else:
-            logging.debug(f'Writing {description(data)} to {destination}')
-
             with open(destination, 'wb') as output:
                 output.write(data)
 
+            logging.debug(f'Wrote {description(data)} to {destination}')

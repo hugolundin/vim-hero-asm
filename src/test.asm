@@ -1,1 +1,1 @@
-ldi r0, 0xFF
+ld r0, r1
