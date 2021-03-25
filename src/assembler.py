@@ -32,7 +32,7 @@ class Assembler:
         statements = []
 
         for line in lines:
-            statement = self.parser.parse(line)
+            statement = self.parser.parse(line.strip())
 
             if statement.op:
                 if statement.op in pseudo_instructions:
