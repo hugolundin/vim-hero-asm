@@ -1,27 +1,9 @@
 from simpleeval import simple_eval
 from bitarray.util import int2ba
 from bitarray import bitarray
-from line import Line
 
-INSTRUCTION_LEN = 32
-
-class Instruction:
-    def __init__(self, op, *builders):
-        self.op = bitarray(op)
-        self.builders = builders
-
-    def assemble(self, arguments, labels, pc) -> bitarray:
-        result = self.op.copy()
-
-        for builder in self.builders:
-            if builder := builder:
-                argument, *arguments = arguments
-                builder(result, argument, labels, pc)
-
-        padding = INSTRUCTION_LEN - len(result)
-        result.extend('0'*padding)
-
-        return result
+from statement import Statement
+from instruction import Instruction
 
 registers = {
     'r0'    : '11111',
@@ -77,6 +59,6 @@ instructions = {
     'jmpi'  : Instruction('000100', imm21)
 }
 
-transformers = {
-    'henak' : lambda args: Line(op='jmpi', args=['718'])
+pseudo_instructions = {
+    'henak' : lambda args: Statement(op='jmpi', args=['718'])
 }

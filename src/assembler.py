@@ -1,55 +1,56 @@
-import re
-from line import parse_line
 from bitarray import bitarray
-from architecture import registers, instructions, transformers
+from parser import Parser
+from architecture import registers, instructions, pseudo_instructions
 
 class AssemblyError(Exception):
     """Raised when an error occurs during assembly."""
     pass
 
 class Assembler:
-    def __init__(self):
+    def __init__(self, parser=Parser()):
         self.pc = 0
         self.labels = {}
-        self.instructions = []
+        self.parser = parser
         self.result = bitarray()
-
-    def instruction(self, line):
-        return line.op
-
-    def label(self, line):
-        return line.label
-
-    def transformer(self, line):
-        return transformers.get(line.op)
-
-    def transform(self, line):
-        return transformers[parsed_line.op](parsed_line.args)
-
-    def parse_instructions(self, lines):        
-        for line in lines:
-            parsed_line = parse_line(line)
-
-            if self.instruction(parsed_line):
-                if transformer := self.transformer(parsed_line):
-                    result = transformer(parsed_line.args)
-
-                    if isinstance(result, list):
-                        self.instructions.extend(result)
-                    else:
-                        self.instructions.append(result)
-                else:
-                    self.pc += 1
-                    self.instructions.append(parsed_line)
-
-            if label := self.label(parsed_line):
-                self.labels[label] = self.pc
-
+    
     def assemble(self, lines) -> bytes:
-        self.parse_instructions(lines)
+        statements = self.parse(lines)
 
-        for line in self.instructions:
-            if instruction := instructions.get(line.op):
-                self.result.extend(instruction.assemble(line.args, self.labels, self.pc))
+        for statement in statements:
+
+            # Assemble the current statement.
+            result = instructions[statement.op].assemble(
+                arguments=statement.args,
+                labels=self.labels,
+                pc=self.pc)
+
+            self.result.extend(result)
 
         return self.result.tobytes()
+
+    def parse(self, lines):
+        statements = []
+
+        for line in lines:
+            statement = self.parser.parse(line)
+
+            if statement.op:
+                if statement.op in pseudo_instructions:
+                    result = self.transform(statement)
+                    
+                    if isinstance(result, list):
+                        statements.extend(result)
+                    else:
+                        statements.append(result)
+
+                elif statement.op in instructions:
+                    self.pc += 1
+                    statements.append(statement)
+
+                else:
+                    raise AssemblyError(f'Invalid opcode: {statement.op}')
+
+            if statement.label:
+                self.labels[statement.label] = self.pc
+
+        return statements
