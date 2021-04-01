@@ -6,36 +6,36 @@ from statement import Statement
 from instruction import Instruction
 
 registers = {
-    'r0'    : '11111',
-    'r1'    : '00010',
-    'r2'    : '00011',
-    'r3'    : '00100',
-    'r4'    : '00101',
-    'r5'    : '00000',
-    'r6'    : '00000',
-    'r7'    : '00000',
-    'r8'    : '00000',
-    'r9'    : '00000',
-    'r10'   : '00000',
-    'r11'   : '00000',
-    'r12'   : '00000',
-    'r13'   : '00000',
-    'r14'   : '00000',
-    'r15'   : '00000',
-    'r16'   : '00000',
-    'r17'   : '00000',
-    'r18'   : '00000',
-    'r19'   : '00000',
-    'r20'   : '00000',
-    'r21'   : '00000',
-    'r22'   : '00000',
-    'r23'   : '00000',
-    'r24'   : '00000',
-    'r25'   : '00000',
-    'r26'   : '00000',
-    'pc'    : '00000',
-    'sp'    : '00000',
-    'flags' : '00000'
+    'r0'    : '00000',
+    'r1'    : '00001',
+    'r2'    : '00010',
+    'r3'    : '00011',
+    'r4'    : '00100',
+    'r5'    : '00101',
+    'r6'    : '00110',
+    'r7'    : '00111',
+    'r8'    : '01000',
+    'r9'    : '01001',
+    'r10'   : '01010',
+    'r11'   : '01011',
+    'r12'   : '01100',
+    'r13'   : '01101',
+    'r14'   : '01110',
+    'r15'   : '01111',
+    'r16'   : '10000',
+    'r17'   : '10001',
+    'r18'   : '10010',
+    'r19'   : '10011',
+    'r20'   : '10100',
+    'r21'   : '10101',
+    'r22'   : '10110',
+    'r23'   : '10111',
+    'r24'   : '11000',
+    'r25'   : '11001',
+    'r26'   : '11010',
+    'pc'    : '11011',
+    'sp'    : '11100',
+    'flags' : '11101'
 }
 
 def reg(result, argument, labels, pc):
@@ -51,12 +51,62 @@ def imm16(result, argument, labels, pc):
     result.extend(int2ba(value, length=16))
 
 instructions = {
+
+    # Load / Store
+    'ld'    : Instruction('000001'),
+    'st'    : Instruction('000010'),
+    'mov'   : Instruction('000011'),
+    'movhi' : Instruction('000100'),
+    'movli' : Instruction('000101'),
+    'push'  : Instruction('000110'),
+    'pop'   : Instruction('000111'),
+
+    # Arithmetic
+    'add'  : Instruction('001010'),
+    'addi' : Instruction('001011'),
+    'sub'  : Instruction('001100'),
+    'subi' : Instruction('001101'),
+    'mul'  : Instruction('001110'),
+    'muli' : Instruction('001111'),
+    'inc'  : Instruction('010000'),
+    'dec'  : Instruction('010001'),
+
+    # Shift
+    'lsl' : Instruction('010100'),
+    'asl' : Instruction('010101'),
+    'lsr' : Instruction('010110'),
+    'asr' : Instruction('010111'),
+
+    # Logic
+    'and'  : Instruction('011010'),
+    'andi' : Instruction('011011'),
+    'or'   : Instruction('011100'),
+    'ori'  : Instruction('011101'),
+    'not'  : Instruction('011110'),
+    'xor'  : Instruction('011111'),
+
+    # Compare
+    'cmp'  : Instruction('100011'),
+    'cmpi' : Instruction('100100'),
+
+    # Branch
+    'beq'   : Instruction('101000'),
+    'bneq'  : Instruction('101001'),
+    'blt'   : Instruction('101010'),
+    'bgt'   : Instruction('101011'),
+    'blteq' : Instruction('101100'),
+    'bgteq' : Instruction('101101'),
+    'jmp'   : Instruction('101110'),
+    'jmpi'  : Instruction('101111'),
+
+    # Subroutines
+    'call' : Instruction('110001'),
+    'ret'  : Instruction('110010'),
+
+    # Other
     'nop'   : Instruction('000000'),
-    'ld'    : Instruction('000001', reg, reg),
-    'ldi'   : Instruction('111111', reg, imm21),
-    'cmp'   : Instruction('000011', reg, reg),
-    'cmpi'  : Instruction('000011', reg, imm16),
-    'jmpi'  : Instruction('000100', imm21)
+    'halt'  : Instruction('110110'),
+    'henak' : Instruction('111111'),
 }
 
 pseudo_instructions = {
