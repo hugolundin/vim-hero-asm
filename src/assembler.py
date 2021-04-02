@@ -1,6 +1,7 @@
 from bitarray import bitarray
 from parser import Parser
 from architecture import registers, instructions, pseudo_instructions
+from token import Token, TOKEN_LABEL, TOKEN_MNEMONIC, TOKEN_DIRECTIVE, TOKEN_REGISTER, TOKEN_EXPRESSION
 
 class AssemblyError(Exception):
     """Raised when an error occurs during assembly."""

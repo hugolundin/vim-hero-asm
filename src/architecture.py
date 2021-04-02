@@ -2,7 +2,6 @@ from simpleeval import simple_eval
 from bitarray.util import int2ba
 from bitarray import bitarray
 
-from tokens import Statement
 from instruction import Instruction
 
 registers = {

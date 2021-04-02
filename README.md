@@ -9,3 +9,15 @@ $ python3 main.py test.asm --stdout | xxd
 ```
 
 `-b` for binary view
+
+## Grammar 
+
+```
+program     ::= statement*
+statement   ::= [label] [directive|instruction] [comment] newline 
+label       ::= string ':'
+directive   ::= '.' string 
+instruction ::= string [operand (',' string)*]
+operand     ::= ['+' | '-'] (string '(' string ')' )
+
+```
