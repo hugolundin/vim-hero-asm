@@ -4,7 +4,7 @@ from bitarray import bitarray
 
 from instruction import Instruction
 
-registers = {
+REGISTERS = {
     'r0'    : '00000',
     'r1'    : '00001',
     'r2'    : '00010',
@@ -37,20 +37,20 @@ registers = {
     'flags' : '11101'
 }
 
-def reg(result, argument, labels, pc):
-    if register := registers.get(argument):
+def reg(result, mnemonic, index):
+    if register := registers.get(mnemonic.args[index]):
         result.extend(register)
 
-def imm21(result, argument, labels, pc):
-    value = simple_eval(argument)
+def imm21(result, mnemonic, index):
+    value = simple_eval(mnemonic.args[index])
     result.extend(int2ba(value, length=21))
 
-def imm16(result, argument, labels, pc):
-    value = simple_eval(argument)
+def imm16(result, mnemonic, index):
+    value = simple_eval(mnemonic.args[index])
     result.extend(int2ba(value, length=16))
 
-instructions = {
-
+INSTRUCTIONS = {
+    
     # Load / Store
     'ld'    : Instruction('000001'),
     'st'    : Instruction('000010'),
@@ -106,8 +106,4 @@ instructions = {
     'nop'   : Instruction('000000'),
     'halt'  : Instruction('110110'),
     'henak' : Instruction('111111'),
-}
-
-pseudo_instructions = {
-    'henak' : lambda args: Statement(op='jmpi', args=['718'])
 }

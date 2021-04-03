@@ -4,7 +4,7 @@ import logging
 import sys
 
 from utilities import description
-from assembler import Assembler, AssemblyError
+from assembler import Assembler, AssemblyException
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

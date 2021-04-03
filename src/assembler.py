@@ -1,57 +1,29 @@
+from architecture import REGISTERS, INSTRUCTIONS
 from bitarray import bitarray
 from parser import Parser
-from architecture import registers, instructions, pseudo_instructions
-from token import Token, TOKEN_LABEL, TOKEN_MNEMONIC, TOKEN_DIRECTIVE, TOKEN_REGISTER, TOKEN_EXPRESSION
+import logging
 
-class AssemblyError(Exception):
+class AssemblyException(Exception):
     """Raised when an error occurs during assembly."""
     pass
 
 class Assembler:
-    def __init__(self, parser=Parser()):
+    def __init__(self):
         self.pc = 0
-        self.labels = {}
-        self.parser = parser
+        self.parser = Parser()
         self.result = bitarray()
     
     def assemble(self, lines) -> bytes:
-        statements = self.parse(lines)
+        self.parser.parse(lines)
 
-        for statement in statements:
+        for mnemonic in self.parser.mnemonics:
+            # Assemble the current mnemonic.
+            instruction = INSTRUCTIONS.get(mnemonic.op)
 
-            # Assemble the current statement.
-            result = instructions[statement.op].assemble(
-                arguments=statement.args,
-                labels=self.labels,
-                pc=self.pc)
+            if not instruction:
+                raise AssemblyException(f'Unknown instruction on line {mnemonic.pc}: {mnemonic.op}')
 
+            result = instruction.assemble(mnemonic)
             self.result.extend(result)
 
-        return self.result.tobytes()
-
-    def parse(self, lines):
-        statements = []
-
-        for line in lines:
-            statement = self.parser.parse(line.strip())
-
-            if statement.op:
-                if statement.op in pseudo_instructions:
-                    result = self.transform(statement)
-                    
-                    if isinstance(result, list):
-                        statements.extend(result)
-                    else:
-                        statements.append(result)
-
-                elif statement.op in instructions:
-                    self.pc += 1
-                    statements.append(statement)
-
-                else:
-                    raise AssemblyError(f'Invalid opcode: {statement.op}')
-
-            if statement.label:
-                self.labels[statement.label] = self.pc
-
-        return statements
+        return self.result.tobytes()      
