@@ -1,8 +1,7 @@
+from instruction import Instruction
 from simpleeval import simple_eval
 from bitarray.util import int2ba
 from bitarray import bitarray
-
-from instruction import Instruction
 
 REGISTERS = {
     'r0'    : '00000',
@@ -38,25 +37,29 @@ REGISTERS = {
 }
 
 def reg(result, mnemonic, index):
-    if register := registers.get(mnemonic.args[index]):
-        result.extend(register)
+    register = REGISTERS.get(mnemonic.args[index])
 
-def imm21(result, mnemonic, index):
-    value = simple_eval(mnemonic.args[index])
-    result.extend(int2ba(value, length=21))
+    if not register:
+        raise ArchitectureException(f'Unknown register {mnemonic.args[index]}')
+
+    result.extend(register)
 
 def imm16(result, mnemonic, index):
     value = simple_eval(mnemonic.args[index])
     result.extend(int2ba(value, length=16))
 
+def imm21(result, mnemonic, index):
+    value = simple_eval(mnemonic.args[index])
+    result.extend(int2ba(value, length=21))
+
 INSTRUCTIONS = {
-    
+
     # Load / Store
-    'ld'    : Instruction('000001'),
-    'st'    : Instruction('000010'),
-    'mov'   : Instruction('000011'),
-    'movhi' : Instruction('000100'),
-    'movli' : Instruction('000101'),
+    'ld'    : Instruction('000001', reg, reg, imm16),
+    'st'    : Instruction('000010', reg, reg, imm16),
+    'mov'   : Instruction('000011', reg, reg),
+    'movhi' : Instruction('000100', reg, imm16),
+    'movli' : Instruction('000101', reg, imm16),
     'push'  : Instruction('000110'),
     'pop'   : Instruction('000111'),
 
@@ -107,3 +110,6 @@ INSTRUCTIONS = {
     'halt'  : Instruction('110110'),
     'henak' : Instruction('111111'),
 }
+
+# 000101 00000 0000000000110010 [00000]
+#  op      D         50         padding

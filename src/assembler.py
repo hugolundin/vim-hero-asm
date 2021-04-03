@@ -21,7 +21,8 @@ class Assembler:
             instruction = INSTRUCTIONS.get(mnemonic.op)
 
             if not instruction:
-                raise AssemblyException(f'Unknown instruction on line {mnemonic.pc}: {mnemonic.op}')
+                raise AssemblyException(
+                    f'Unknown instruction on line {mnemonic.pc}: {mnemonic.op}')
 
             result = instruction.assemble(mnemonic)
             self.result.extend(result)
