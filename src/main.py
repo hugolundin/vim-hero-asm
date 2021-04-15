@@ -3,7 +3,7 @@ import argparse
 import logging
 import sys
 
-from utilities import description
+from utilities import describe_data, error
 from assembler import Assembler, AssemblyException
 
 if __name__ == '__main__':
@@ -20,7 +20,7 @@ if __name__ == '__main__':
         action='store_const', dest='level', const=logging.DEBUG)
 
     parser.add_argument(
-        '-c', '--check',
+        '-a', '--assemble',
         help='Assemble the project without writing the produced result to disk.',
         action='store_true')
 
@@ -48,11 +48,13 @@ if __name__ == '__main__':
     data = assembler.assemble(args.file.read().split('\n'))
     destination = f'{Path(args.file.name).stem}.dat'
 
-    if not args.check:
+    logging.debug('Assembling...')
+
+    if not args.assemble:        
         if args.stdout:
             sys.stdout.buffer.write(data)
         else:
             with open(destination, 'wb') as output:
                 output.write(data)
 
-            logging.debug(f'Wrote {description(data)} to {destination}')
+            logging.debug(f'Wrote {describe_data(data)} to {destination}')

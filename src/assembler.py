@@ -16,7 +16,14 @@ class Assembler:
     def assemble(self, lines) -> bytes:
         self.parser.parse(lines)
 
+        logging.debug(f'{self.parser}')
+
+        for directive in self.parser.directives:
+            print(directive)
+
         for mnemonic in self.parser.mnemonics:
+            print(mnemonic)
+
             # Assemble the current mnemonic.
             instruction = INSTRUCTIONS.get(mnemonic.op)
 

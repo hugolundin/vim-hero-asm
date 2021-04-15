@@ -1,4 +1,5 @@
 from tokens import Directive, Mnemonic
+import logging
 
 class ParseException(Exception):
     """Raised when an error occurs while parsing."""
@@ -17,7 +18,7 @@ class Parser:
     def parse(self, lines):
         self.pc = 0
 
-        for line in lines:
+        for line_number, line in enumerate(lines, start=1):
         
             # Start by discarding the comment. 
             line = self.erase_comment(line)
@@ -35,19 +36,19 @@ class Parser:
 
             if op:
 
-                # We only increase the program counter whenever
-                # an instruction is found. That way, labels followed
-                # by an empty row be attached to the next instruction.
-                self.pc += 1
-
-                if directive := self.directive(op, line):
+                if directive := self.directive(op, line, line_number):
                     self.directives.append(directive)
                 else:
-                    if mnemonic := self.mnemonic(op, line):
+                    if mnemonic := self.mnemonic(op, line, line_number):
                         self.mnemonics.append(mnemonic)
+                        
+                        # We only increase the program counter whenever
+                        # an instruction is found. That way, labels followed
+                        # by an empty row be attached to the next instruction.
+                        self.pc += 1
+                        
                     else:
-                        raise ParseException('Unexpected operand.')
-                    
+                        raise ParseException('Unexpected operand.')   
 
     def erase_comment(self, line):
         if not line:
@@ -82,15 +83,38 @@ class Parser:
         else:
             return (s[0], None)
 
-    def directive(self, op, line):
+    def directive(self, op, line, line_number):
         if not op or op[0] != '.':
+            # TODO: Raise exception.
             return None
 
-        arguments = [arg.strip() for arg in line.split(' ')]
-        directive = Directive(self.pc, op[1:], arguments)
+        arg = ''
+        args = []
+        string = False
+        
+        for c in line:
+            if c in ['"', "'"]:
+                if string:
+                    args.append(arg)
+                    arg = ''
+                else:
+                    string = True
+
+                continue
+            
+            if c.isspace():
+                if string:
+                    arg += c
+                else:
+                    args.append(arg)
+                    arg = ''
+
+            arg += c
+                
+        directive = Directive(line_number, self.pc, op[1:], args)
         return directive
 
-    def mnemonic(self, op, line):
+    def mnemonic(self, op, line, line_number):
         arguments = [arg.strip() for arg in line.split(',')]
-        mnemonic = Mnemonic(self.pc, op, arguments)
+        mnemonic = Mnemonic(line_number, op, arguments)
         return mnemonic
