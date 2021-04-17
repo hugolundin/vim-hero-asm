@@ -1,9 +1,27 @@
-from tokens import Directive, Mnemonic
 import logging
 
 class ParseException(Exception):
     """Raised when an error occurs while parsing."""
     pass
+
+class Directive:
+    def __init__(self, location, pc, op, args=[]):
+        self.location = location
+        self.pc = pc
+        self.op = op
+        self.args = args
+
+    def __repr__(self):
+        return str(self.__dict__)
+
+class Mnemonic:
+    def __init__(self, line, op, args=[]):
+        self.line = line
+        self.op = op
+        self.args = args
+
+    def __repr__(self):
+        return str(self.__dict__)
 
 class Parser:
     def __init__(self):
@@ -15,7 +33,7 @@ class Parser:
     def __repr__(self):
         return str(self.__dict__)
 
-    def parse(self, lines):
+    def parse(self, lines, offset=0):
         self.pc = 0
 
         for line_number, line in enumerate(lines, start=1):

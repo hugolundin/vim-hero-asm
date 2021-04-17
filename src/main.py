@@ -3,7 +3,7 @@ import argparse
 import logging
 import sys
 
-from utilities import describe_data, error
+from utilities import describe_data, error, warning, info
 from assembler import Assembler, AssemblyException
 
 if __name__ == '__main__':
@@ -45,10 +45,13 @@ if __name__ == '__main__':
         level=args.level)
 
     assembler = Assembler()
-    data = assembler.assemble(args.file.read().split('\n'))
-    destination = f'{Path(args.file.name).stem}.dat'
 
-    logging.debug('Assembling...')
+    try:
+        data = assembler.assemble(args.file.read().split('\n'))
+    except Exception as e:
+        error(str(e))
+
+    destination = f'{Path(args.file.name).stem}.dat'
 
     if not args.assemble:        
         if args.stdout:

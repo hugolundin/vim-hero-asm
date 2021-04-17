@@ -9,6 +9,14 @@ def describe_data(data):
 
     return f'{length} bytes'
 
-def error(title, message):
-    print(f'{colorama.Fore.RED}{title}: {colorama.Style.RESET_ALL} {message}')
-    exit(1)
+def message(title, msg, color):
+    print(f'{color}{title}: {colorama.Style.RESET_ALL}{msg}')
+
+def info(msg):
+    message('Info', msg, colorama.Fore.GREEN)
+
+def warning(msg):
+    message('Warning', msg, colorama.Fore.YELLOW)
+
+def error(msg):
+    message('Error', msg, colorama.Fore.RED)

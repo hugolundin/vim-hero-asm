@@ -29,7 +29,7 @@ class Assembler:
 
             if not instruction:
                 raise AssemblyException(
-                    f'Unknown instruction on line {mnemonic.pc}: {mnemonic.op}')
+                    f'Unknown instruction on line {mnemonic.line}: {mnemonic.op}')
 
             result = instruction.assemble(mnemonic)
             self.result.extend(result)
