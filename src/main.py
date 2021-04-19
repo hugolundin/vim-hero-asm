@@ -2,22 +2,13 @@ from pathlib import Path
 import argparse
 import logging
 import sys
+import os
 
 from utilities import describe_data, error, warning, info
 from assembler import Assembler, AssemblyException
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-
-    parser.add_argument(
-        '-v', '--verbose',
-        help='Show verbose output',
-        action='store_const', dest='level', const=logging.INFO)
-
-    parser.add_argument(
-        '-d', '--debug',
-        help='Show debug output.',
-        action='store_const', dest='level', const=logging.DEBUG)
 
     parser.add_argument(
         '-a', '--assemble',
@@ -31,27 +22,12 @@ if __name__ == '__main__':
 
     parser.add_argument(
         'file',
-        help='File to assemble',
-        type=argparse.FileType('r', encoding='UTF-8'))
+        help='File to assemble')
 
     args = parser.parse_args()
-
-    # If neither verbose mode or debug mode are used, the default
-    # log level is `logging.WARNING`.  
-    logging.basicConfig(
-        stream=sys.stdout,
-        format='%(asctime)s: %(message)s',
-        datefmt='%Y-%m-%d %H:%M:%S',
-        level=args.level)
-
     assembler = Assembler()
-
-    try:
-        data = assembler.assemble(args.file.read().split('\n'))
-    except Exception as e:
-        error(str(e))
-
-    destination = f'{Path(args.file.name).stem}.dat'
+    data = assembler.assemble(args.file)
+    destination = f'{Path(args.file).stem}.dat'
 
     if not args.assemble:        
         if args.stdout:

@@ -5,9 +5,8 @@ class ParseException(Exception):
     pass
 
 class Directive:
-    def __init__(self, location, pc, op, args=[]):
-        self.location = location
-        self.pc = pc
+    def __init__(self, source, op, args=[]):
+        self.source = source
         self.op = op
         self.args = args
 
@@ -15,8 +14,8 @@ class Directive:
         return str(self.__dict__)
 
 class Mnemonic:
-    def __init__(self, line, op, args=[]):
-        self.line = line
+    def __init__(self, source, op, args=[]):
+        self.source = source
         self.op = op
         self.args = args
 
@@ -36,10 +35,10 @@ class Parser:
     def parse(self, lines, offset=0):
         self.pc = 0
 
-        for line_number, line in enumerate(lines, start=1):
-        
+        for source in lines:
+            
             # Start by discarding the comment. 
-            line = self.erase_comment(line)
+            line = self.erase_comment(source.content)
 
             # Fetch the label. 
             label, line = self.label(line)
@@ -53,11 +52,10 @@ class Parser:
             op, line = self.op(line)
 
             if op:
-
-                if directive := self.directive(op, line, line_number):
+                if directive := self.directive(op, line, source):
                     self.directives.append(directive)
                 else:
-                    if mnemonic := self.mnemonic(op, line, line_number):
+                    if mnemonic := self.mnemonic(op, line, source):
                         self.mnemonics.append(mnemonic)
                         
                         # We only increase the program counter whenever
@@ -66,7 +64,7 @@ class Parser:
                         self.pc += 1
                         
                     else:
-                        raise ParseException('Unexpected operand.')   
+                        raise ParseException(f'{source.name}:{source.number}: invalid instruction: "{source.content}"')   
 
     def erase_comment(self, line):
         if not line:
@@ -101,7 +99,7 @@ class Parser:
         else:
             return (s[0], None)
 
-    def directive(self, op, line, line_number):
+    def directive(self, op, line, source):
         if not op or op[0] != '.':
             # TODO: Raise exception.
             return None
@@ -129,10 +127,8 @@ class Parser:
 
             arg += c
                 
-        directive = Directive(line_number, self.pc, op[1:], args)
-        return directive
+        return Directive(source, op[1:], args)
 
-    def mnemonic(self, op, line, line_number):
-        arguments = [arg.strip() for arg in line.split(',')]
-        mnemonic = Mnemonic(line_number, op, arguments)
-        return mnemonic
+    def mnemonic(self, op, line, source):
+        args = [arg.strip() for arg in line.split(',')]
+        return Mnemonic(source, op, args)
