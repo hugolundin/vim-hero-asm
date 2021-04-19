@@ -29,7 +29,7 @@ if __name__ == '__main__':
     data = assembler.assemble(args.file)
     destination = f'{Path(args.file).stem}.dat'
 
-    if not args.assemble:        
+    if not args.assemble:
         if args.stdout:
             sys.stdout.buffer.write(data)
         else:

@@ -30,12 +30,8 @@ class Assembler:
         lines = self.load(name)
         self.parser.parse(lines)
 
-        for directive in self.parser.directives:
-            print(directive)
-            pass
-
         for mnemonic in self.parser.mnemonics:
-            print(mnemonic)
+            #print(mnemonic)
 
             # Assemble the current mnemonic.
             instruction = INSTRUCTIONS.get(mnemonic.op)
@@ -51,11 +47,15 @@ class Assembler:
 
     def load(self, name, paths=[]):
         instructions = []
+        source_file = os.path.abspath(name)
+        source_directory = os.path.dirname(source_file)
 
-        paths.append(name)
+        if source_file in paths:
+            return []
+        else:
+            paths.append(source_file)
         
-        with open(name, 'r') as f:
-            current = os.path.abspath(name)
+        with open(source_file, 'r') as f:
             lines = [line.strip() for line in f.read().split('\n')]
 
             for index, line in enumerate(lines):
@@ -63,14 +63,12 @@ class Assembler:
                     continue
 
                 if line.startswith('.include'):
-                    INCLUDE_START = '.include("' 
-                    INCLUDE_END = '")'
+                    INCLUDE_START = '.include "' 
+                    INCLUDE_END = '"'
 
                     child = line[line.find(INCLUDE_START) + len(INCLUDE_START):line.rfind(INCLUDE_END)]
-
-                    if child not in paths:
-                        instructions.extend(self.load(child, paths))
+                    instructions.extend(self.load(os.path.join(source_directory, child), paths))
                 else:            
-                    instructions.append(Line(line, current, index))
+                    instructions.append(Line(line, source_file, index))
 
         return instructions

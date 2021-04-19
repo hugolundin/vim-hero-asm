@@ -4,15 +4,6 @@ class ParseException(Exception):
     """Raised when an error occurs while parsing."""
     pass
 
-class Directive:
-    def __init__(self, source, op, args=[]):
-        self.source = source
-        self.op = op
-        self.args = args
-
-    def __repr__(self):
-        return str(self.__dict__)
-
 class Mnemonic:
     def __init__(self, source, op, args=[]):
         self.source = source
@@ -26,6 +17,7 @@ class Parser:
     def __init__(self):
         self.pc = 0
         self.labels = {}
+        self.constants = {}
         self.mnemonics = []
         self.directives = []
 
@@ -52,8 +44,8 @@ class Parser:
             op, line = self.op(line)
 
             if op:
-                if directive := self.directive(op, line, source):
-                    self.directives.append(directive)
+                if self.directive(op, line, source):
+                    continue
                 else:
                     if mnemonic := self.mnemonic(op, line, source):
                         self.mnemonics.append(mnemonic)
@@ -100,35 +92,28 @@ class Parser:
             return (s[0], None)
 
     def directive(self, op, line, source):
-        if not op or op[0] != '.':
+        if not op:
             # TODO: Raise exception.
+            return False
+
+        if op[0] != '.':
+            return False
+
+        # TODO: Improve constant handling.
+        if op == '.constant':
+            key, value = line.split(' ', 1)
+            self.constants[key] = value
+            return True
+
+        # TODO: Raise exception. 
+        return False
+                
+    def mnemonic(self, op, line, source):
+        if not op:
             return None
 
-        arg = ''
-        args = []
-        string = False
+        if not line:
+            return Mnemonic(source, op, [])
         
-        for c in line:
-            if c in ['"', "'"]:
-                if string:
-                    args.append(arg)
-                    arg = ''
-                else:
-                    string = True
-
-                continue
-            
-            if c.isspace():
-                if string:
-                    arg += c
-                else:
-                    args.append(arg)
-                    arg = ''
-
-            arg += c
-                
-        return Directive(source, op[1:], args)
-
-    def mnemonic(self, op, line, source):
         args = [arg.strip() for arg in line.split(',')]
         return Mnemonic(source, op, args)
