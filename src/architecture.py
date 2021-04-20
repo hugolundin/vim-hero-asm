@@ -36,7 +36,7 @@ REGISTERS = {
     'flags' : '11101'
 }
 
-def reg(result, mnemonic, index):
+def reg(result, mnemonic, labels, constants, index):
     register = REGISTERS.get(mnemonic.args[index])
 
     if not register:
@@ -44,17 +44,16 @@ def reg(result, mnemonic, index):
 
     result.extend(register)
 
-def imm16(result, mnemonic, index):
-    value = simple_eval(mnemonic.args[index])
-    result.extend(int2ba(value, length=16))
+def imm(length):
+    def f(result, mnemonic, labels, constants, index):
+        value = int(simple_eval(mnemonic.args[index], names=labels|constants))
+        result.extend(int2ba(value, length=length))
 
-def imm21(result, mnemonic, index):
-    value = simple_eval(mnemonic.args[index])
-    result.extend(int2ba(value, length=21))
+    return f
 
-def imm26(result, mnemonic, index):
-    value = simple_eval(mnemonic.args[index])
-    result.extend(int2ba(value, length=26))
+imm16 = imm(16)
+imm21 = imm(21)
+imm26 = imm(26)
 
 INSTRUCTIONS = {
 

@@ -9,11 +9,10 @@ class Line:
         self.name = name
         self.number = number
 
-    def description(self) -> str:
+    def get_location(self) -> str:
         return f'{self.name}, line {self.number + 1}'
 
     def __repr__(self):
-        #return f'"{self.content}"'
         return str(self.__dict__)
 
 class AssemblyException(Exception):
@@ -38,9 +37,9 @@ class Assembler:
 
             if not instruction:
                 raise AssemblyException(
-                    f'{mnemonic.source.description()}: unknown op "{mnemonic.op}"')
+                    f'{mnemonic.source.get_location()}: unknown op "{mnemonic.op}"')
 
-            result = instruction.assemble(mnemonic)
+            result = instruction.assemble(mnemonic, self.parser.labels, self.parser.constants)
             self.result.extend(result)
 
         return self.result.tobytes()

@@ -10,7 +10,7 @@ class Instruction:
         self.op = bitarray(op)
         self.builders = builders
 
-    def assemble(self, mnemonic) -> bitarray:
+    def assemble(self, mnemonic, labels, constants) -> bitarray:
         args = mnemonic.args
         result = self.op.copy()
 
@@ -22,7 +22,7 @@ class Instruction:
             if not builder:
                 continue
 
-            builder(result, mnemonic, index)
+            builder(result, mnemonic, labels, constants, index)
 
         padding = INSTRUCTION_LEN - len(result)
         result.extend('0'*padding)
