@@ -1,46 +1,35 @@
-from architecture import REGISTERS, INSTRUCTIONS
+from isa import REGISTERS, INSTRUCTIONS
 from bitarray import bitarray
 from parser import Parser
 import os
 
-class Line:
-    def __init__(self, content, name, number):
-        self.content = content
-        self.name = name
-        self.number = number
+from line import Line
+from exceptions.assembly import AssemblyException
 
-    def get_location(self) -> str:
-        return f'{self.name}, line {self.number + 1}'
-
-    def __repr__(self):
-        return str(self.__dict__)
-
-class AssemblyException(Exception):
-    """Raised when an error occurs during assembly."""
-    pass
+INSTRUCTION_LEN = 32
 
 class Assembler:
     def __init__(self):
         self.pc = 0
         self.parser = Parser()
         self.result = bitarray()
-    
+
     def assemble(self, name) -> bytes:
-        lines = self.load(name)
+        lines = self.preprocess(self.load(name))
         self.parser.parse(lines)
 
-        for mnemonic in self.parser.mnemonics:
-            #print(mnemonic)
+        for instruction in self.parser.instructions:
+            print(instruction)
+            print('')
 
-            # Assemble the current mnemonic.
-            instruction = INSTRUCTIONS.get(mnemonic.op)
+        for instruction in self.parser.instructions:
+            op_code = INSTRUCTIONS.get(instruction.op)
 
-            if not instruction:
-                raise AssemblyException(
-                    f'{mnemonic.source.get_location()}: unknown op "{mnemonic.op}"')
+            if op_code:
+                self.instruction(instruction, op_code)
 
-            result = instruction.assemble(mnemonic, self.parser.labels, self.parser.constants)
-            self.result.extend(result)
+            raise AssemblyException(
+                f'{instruction.source.get_location()}: unknown op "{instruction.op}"')
 
         return self.result.tobytes()
 
@@ -71,3 +60,40 @@ class Assembler:
                     instructions.append(Line(line, source_file, index))
 
         return instructions
+
+    # def reg(self, instruction, index):
+    #     try:
+    #         return instruction.args[index]
+    #     except IndexError:
+    #         raise AssemblyException('expected arg')
+
+    # def imm(self, length, arg):
+    #     if len(instruction.args) 
+
+    def preprocess(self, lines):
+        pp = Parser()
+        pp.parse(lines)
+
+        for instruction in pp.instructions:
+            op = instruction.op
+            args = instruction.args
+
+            # TODO: Why +1?
+            if op == 'inc':
+                lines[instruction.source.number + 1].content = f'addi {args[0]}, {args[0]}, 1'
+
+            elif op == 'dec':                
+                lines[instruction.source.number + 1].content = f'subi {args[0]}, {args[0]}, 1'
+
+        return lines
+
+    def instruction(self, instruction, op_code):
+        result = bitarray(op_code)
+        
+        # opcode dispatch
+        # ...
+        # ...
+
+        padding = INSTRUCTION_LEN - len(result)
+        result.extend('0' * padding) 
+        self.result.extend(result)

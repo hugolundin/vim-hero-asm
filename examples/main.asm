@@ -2,7 +2,7 @@
 .include "init.asm"
 
 loop:
-    subi r1, r1, SUB_VALUE
+    dec r1
     cmpi r1, END_VALUE
     bneq loop
 end:

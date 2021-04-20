@@ -1,10 +1,7 @@
+from exceptions.parse import ParseException
 import logging
 
-class ParseException(Exception):
-    """Raised when an error occurs while parsing."""
-    pass
-
-class Mnemonic:
+class Instruction:
     def __init__(self, source, op, args=[]):
         self.source = source
         self.op = op
@@ -18,13 +15,13 @@ class Parser:
         self.pc = 0
         self.labels = {}
         self.constants = {}
-        self.mnemonics = []
         self.directives = []
-
+        self.instructions = []
+        
     def __repr__(self):
         return str(self.__dict__)
 
-    def parse(self, lines, offset=0):
+    def parse(self, lines):
         self.pc = 0
 
         for source in lines:
@@ -47,8 +44,8 @@ class Parser:
                 if self.directive(op, line, source):
                     continue
                 else:
-                    if mnemonic := self.mnemonic(op, line, source):
-                        self.mnemonics.append(mnemonic)
+                    if instruction := self.instruction(op, line, source):
+                        self.instructions.append(instruction)
                         
                         # We only increase the program counter whenever
                         # an instruction is found. That way, labels followed
@@ -56,7 +53,8 @@ class Parser:
                         self.pc += 1
                         
                     else:
-                        raise ParseException(f'{source.name}:{source.number}: invalid instruction: "{source.content}"')   
+                        raise ParseException(
+                            f'{source.name}:{source.number}: invalid instruction: "{source.content}"')   
 
     def erase_comment(self, line):
         if not line:
@@ -105,15 +103,17 @@ class Parser:
             self.constants[key] = value
             return True
 
+        # TODO: Add handling of other directives.
+
         # TODO: Raise exception. 
         return False
                 
-    def mnemonic(self, op, line, source):
+    def instruction(self, op, line, source):
         if not op:
             return None
 
         if not line:
-            return Mnemonic(source, op, [])
+            return Instruction(source, op, [])
         
         args = [arg.strip() for arg in line.split(',')]
-        return Mnemonic(source, op, args)
+        return Instruction(source, op, args)
