@@ -15,12 +15,8 @@ class Assembler:
         self.result = bitarray()
 
     def assemble(self, name) -> bytes:
-        lines = self.preprocess(self.load(name))
+        lines = self.process(self.load(name))
         self.parser.parse(lines)
-
-        for instruction in self.parser.instructions:
-            print(instruction)
-            print('')
 
         for instruction in self.parser.instructions:
             op_code = INSTRUCTIONS.get(instruction.op)
@@ -61,20 +57,11 @@ class Assembler:
 
         return instructions
 
-    # def reg(self, instruction, index):
-    #     try:
-    #         return instruction.args[index]
-    #     except IndexError:
-    #         raise AssemblyException('expected arg')
+    def process(self, lines):
+        process_parser = Parser()
+        process_parser.parse(lines)
 
-    # def imm(self, length, arg):
-    #     if len(instruction.args) 
-
-    def preprocess(self, lines):
-        pp = Parser()
-        pp.parse(lines)
-
-        for instruction in pp.instructions:
+        for instruction in process_parser.instructions:
             op = instruction.op
             args = instruction.args
 
@@ -87,9 +74,27 @@ class Assembler:
 
         return lines
 
+    def reg(self, instruction, index, result):
+        try:
+            reg = instruction.args[index]
+        except IndexError:
+            raise AssemblyException(f'{instruction.location()}: missing argument')
+
+        # Resolve constants.
+        if reg in self.parser.constants:
+            reg = self.parser.constants[reg]
+
+        if reg in REGISTERS:
+            result.extend(REGISTERS[reg])
+
+        raise AssemblyException(f'{instruction.location()}: invalid register {reg}')
+
+    def imm(self, length, arg):
+        if len(instruction.args) 
+
     def instruction(self, instruction, op_code):
         result = bitarray(op_code)
-        
+
         # opcode dispatch
         # ...
         # ...
