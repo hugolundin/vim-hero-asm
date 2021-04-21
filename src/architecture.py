@@ -1,0 +1,99 @@
+
+REG   = 0
+IMM11 = 1
+IMM16 = 2
+IMM22 = 3
+PAD5  = 4
+
+REGISTERS = {
+    'r0'    : '00000',
+    'r1'    : '00001',
+    'r2'    : '00010',
+    'r3'    : '00011',
+    'r4'    : '00100',
+    'r5'    : '00101',
+    'r6'    : '00110',
+    'r7'    : '00111',
+    'r8'    : '01000',
+    'r9'    : '01001',
+    'r10'   : '01010',
+    'r11'   : '01011',
+    'r12'   : '01100',
+    'r13'   : '01101',
+    'r14'   : '01110',
+    'r15'   : '01111',
+    'r16'   : '10000',
+    'r17'   : '10001',
+    'r18'   : '10010',
+    'r19'   : '10011',
+    'r20'   : '10100',
+    'r21'   : '10101',
+    'r22'   : '10110',
+    'r23'   : '10111',
+    'r24'   : '11000',
+    'r25'   : '11001',
+    'r26'   : '11010',
+    'pc'    : '11011',
+    'sp'    : '11100',
+    'flags' : '11101'
+}
+
+PSEUDO_INSTRUCTIONS = [
+
+]
+
+INSTRUCTIONS = [
+    # Load / Store
+    {'name': 'ld',    'opcode': '000001', 'format': [REG, REG, IMM16]},
+    {'name': 'str',   'opcode': '000010', 'format': [PAD5, REG, REG, IMM11]},
+    {'name': 'mov',   'opcode': '000011', 'format': [REG, REG]},
+    {'name': 'movhi', 'opcode': '000100', 'format': [REG, IMM16]},
+    {'name': 'movli', 'opcode': '000101', 'format': [REG, IMM16]},
+    {'name': 'push',  'opcode': '000110', 'format': [PAD5, REG]},
+    {'name': 'pop',   'opcode': '000111', 'format': [REG]},
+
+    # Arihmetic
+    {'name': 'add',   'opcode': '001010', 'format': [REG, REG, REG]},
+    {'name': 'addi',  'opcode': '001011', 'format': [REG, REG, IMM16]},
+    {'name': 'sub',   'opcode': '001100', 'format': [REG, REG, REG]},
+    {'name': 'subi',  'opcode': '001101', 'format': [REG, REG, IMM16]},
+    {'name': 'mul',   'opcode': '001110', 'format': [REG, REG, REG]},
+    {'name': 'muli',  'opcode': '001111', 'format': [REG, REG, IMM16]},
+
+    # Shift
+    {'name': 'lsl',  'opcode': '010100', 'format': [REG, REG]},
+    {'name': 'asl',  'opcode': '010101', 'format': [REG, REG]},
+    {'name': 'lsr',  'opcode': '010110', 'format': [REG, REG]},
+    {'name': 'asr',  'opcode': '010111', 'format': [REG, REG]},
+
+    # Logic
+    {'name': 'and',  'opcode': '011010', 'format': [REG, REG, REG]},
+    {'name': 'andi', 'opcode': '011011', 'format': [REG, REG, IMM16]},
+    {'name': 'or',   'opcode': '011100', 'format': [REG, REG, REG]},
+    {'name': 'ori',  'opcode': '011101', 'format': [REG, REG, IMM16]},
+    {'name': 'not',  'opcode': '011110', 'format': [REG, REG]},
+    {'name': 'xor',  'opcode': '011111', 'format': [REG, REG, REG]},
+
+    # Compare
+    {'name': 'cmp',  'opcode': '100011', 'format': [PAD5, REG, REG]},
+    {'name': 'cmpi', 'opcode': '100100', 'format': [PAD5, REG, IMM16]},
+
+    # Branch
+    {'name': 'beq',   'opcode': '101000', 'format': [IMM26]},
+    {'name': 'bneq',  'opcode': '101001', 'format': [IMM26]},
+    {'name': 'blt',   'opcode': '101010', 'format': [IMM26]},
+    {'name': 'bgt',   'opcode': '101011', 'format': [IMM26]},
+    {'name': 'blteq', 'opcode': '101100', 'format': [IMM26]},
+    {'name': 'bgteq', 'opcode': '101101', 'format': [IMM26]},
+    {'name': 'jmp',   'opcode': '101110', 'format': [PAD, REG, IMM16]},
+    {'name': 'jmpi',  'opcode': '101111', 'format': [IMM26]},
+
+    # Subroutines
+    {'name': 'call', 'opcode': '110001', 'format': [REG, REG, REG]},
+    {'name': 'ret',  'opcode': '110010', 'format': [REG, REG, REG]},
+   
+    # Other
+    {'name': 'nop',  'opcode': '000000', 'format': []},
+    {'name': 'halt',  'opcode': '110110', 'format': []},
+    {'name': 'henak',  'opcode': '111111', 'format': []}
+]

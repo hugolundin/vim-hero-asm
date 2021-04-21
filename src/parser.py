@@ -1,5 +1,12 @@
-from exceptions.parse import ParseException
+from exceptions.parse import parseException
 import logging
+
+class InstructionException(Exception):
+    pass
+
+class ParseException(Exception):
+    """Raised when an error occurs while tokenizing."""
+    pass
 
 class Instruction:
     def __init__(self, source, op, args=[]):
@@ -24,10 +31,10 @@ class Parser:
     def parse(self, lines):
         self.pc = 0
 
-        for source in lines:
+        for line in lines:
             
             # Start by discarding the comment. 
-            line = self.erase_comment(source.content)
+            line = self.erase_comment(line)
 
             # Fetch the label. 
             label, line = self.label(line)
@@ -54,7 +61,7 @@ class Parser:
                         
                     else:
                         raise ParseException(
-                            f'{source.name}:{source.number}: invalid instruction: "{source.content}"')   
+                            f'invalid instruction: "{line}"')   
 
     def erase_comment(self, line):
         if not line:

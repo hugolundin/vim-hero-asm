@@ -1,3 +1,0 @@
-
-class InstructionException(Exception):
-    pass

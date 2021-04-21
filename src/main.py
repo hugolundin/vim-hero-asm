@@ -25,8 +25,8 @@ if __name__ == '__main__':
         help='File to assemble')
 
     args = parser.parse_args()
-    assembler = Assembler()
-    data = assembler.assemble(args.file)
+    assembler = Assembler(args.file)
+    data = assembler.assemble()
     destination = f'{Path(args.file).stem}.dat'
 
     if not args.assemble:

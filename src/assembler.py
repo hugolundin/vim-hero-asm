@@ -1,21 +1,25 @@
-from isa import REGISTERS, INSTRUCTIONS
+from arch import REGISTERS, INSTRUCTIONS
 from bitarray import bitarray
-from parser import Parser
+from parser import parser
 import os
 
-from line import Line
 from exceptions.assembly import AssemblyException
 
 INSTRUCTION_LEN = 32
 
-class Assembler:
-    def __init__(self):
-        self.pc = 0
-        self.parser = Parser()
-        self.result = bitarray()
+class AssemblyException(Exception):
+    """Raised when an error occurs during assembly."""
+    pass
 
-    def assemble(self, name) -> bytes:
-        lines = self.process(self.load(name))
+class Assembler:
+    def __init__(self, path):
+        self.pc = 0
+        self.result = bitarray()
+        self.parser = Parser()
+        self.path = os.path.abspath(path)
+
+    def assemble(self) -> bytes:
+        lines = self.load(self.path)
         self.parser.parse(lines)
 
         for instruction in self.parser.instructions:
@@ -29,50 +33,10 @@ class Assembler:
 
         return self.result.tobytes()
 
-    def load(self, name, paths=[]):
-        instructions = []
-        source_file = os.path.abspath(name)
-        source_directory = os.path.dirname(source_file)
-
-        if source_file in paths:
-            return []
-        else:
-            paths.append(source_file)
-        
-        with open(source_file, 'r') as f:
-            lines = [line.strip() for line in f.read().split('\n')]
-
-            for index, line in enumerate(lines):
-                if not line:
-                    continue
-
-                if line.startswith('.include'):
-                    INCLUDE_START = '.include "' 
-                    INCLUDE_END = '"'
-
-                    child = line[line.find(INCLUDE_START) + len(INCLUDE_START):line.rfind(INCLUDE_END)]
-                    instructions.extend(self.load(os.path.join(source_directory, child), paths))
-                else:            
-                    instructions.append(Line(line, source_file, index))
-
-        return instructions
-
-    def process(self, lines):
-        process_parser = Parser()
-        process_parser.parse(lines)
-
-        for instruction in process_parser.instructions:
-            op = instruction.op
-            args = instruction.args
-
-            # TODO: Why +1?
-            if op == 'inc':
-                lines[instruction.source.number + 1].content = f'addi {args[0]}, {args[0]}, 1'
-
-            elif op == 'dec':                
-                lines[instruction.source.number + 1].content = f'subi {args[0]}, {args[0]}, 1'
-
-        return lines
+    @staticmethod
+    def load(path):
+        with open(path, 'r') as s:
+            return [line.strip() for line in s.read().split('\n')]
 
     def reg(self, instruction, index, result):
         try:
@@ -90,7 +54,7 @@ class Assembler:
         raise AssemblyException(f'{instruction.location()}: invalid register {reg}')
 
     def imm(self, length, arg):
-        if len(instruction.args) 
+        pass
 
     def instruction(self, instruction, op_code):
         result = bitarray(op_code)
