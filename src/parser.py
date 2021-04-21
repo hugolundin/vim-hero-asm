@@ -9,9 +9,9 @@ class ParseException(Exception):
     pass
 
 class Instruction:
-    def __init__(self, source, op, args=[]):
-        self.source = source
-        self.op = op
+    def __init__(self, name, line, args=[]):
+        self.name = name
+        self.line = line
         self.args = args
 
     def __repr__(self):
@@ -31,7 +31,7 @@ class Parser:
     def parse(self, lines):
         self.pc = 0
 
-        for line in lines:
+        for index, line in enumerate(lines, start=1):
             
             # Start by discarding the comment. 
             line = self.erase_comment(line)
@@ -48,20 +48,49 @@ class Parser:
             op, line = self.op(line)
 
             if op:
-                if self.directive(op, line, source):
+                if self.directive(op, index, line):
                     continue
+
+                instruction = self.instruction(op, index, line)
+
+                if instruction:
+                    self.instructions.append(instruction)
+
+                    # We only increase the program counter whenever
+                    # an instruction is found. That way, labels followed
+                    # by an empty row be attached to the next instruction.
+                    self.pc += 1
                 else:
-                    if instruction := self.instruction(op, line, source):
-                        self.instructions.append(instruction)
-                        
-                        # We only increase the program counter whenever
-                        # an instruction is found. That way, labels followed
-                        # by an empty row be attached to the next instruction.
-                        self.pc += 1
-                        
-                    else:
-                        raise ParseException(
-                            f'invalid instruction: "{line}"')   
+                    raise ParseException(
+                        f'line {index}: invalid instruction: "{line}"')   
+
+    def directive(self, op, index, line):
+        if not op:
+            # TODO: Raise exception.
+            return False
+
+        if op[0] != '.':
+            return False
+
+        # TODO: Improve constant handling.
+        if op == '.constant':
+            key, value = line.split(' ', 1)
+            self.constants[key] = value
+            return True
+
+        # TODO: Add handling of other directives.
+
+        # TODO: Raise exception. 
+        return False
+
+    def instruction(self, op, index, line):
+        if not op:
+            return None
+
+        if not line:
+            return Instruction(op, index, [])
+        
+        return Instruction(op, index, [arg.strip() for arg in line.split(',')])
 
     def erase_comment(self, line):
         if not line:
@@ -96,31 +125,4 @@ class Parser:
         else:
             return (s[0], None)
 
-    def directive(self, op, line, source):
-        if not op:
-            # TODO: Raise exception.
-            return False
 
-        if op[0] != '.':
-            return False
-
-        # TODO: Improve constant handling.
-        if op == '.constant':
-            key, value = line.split(' ', 1)
-            self.constants[key] = value
-            return True
-
-        # TODO: Add handling of other directives.
-
-        # TODO: Raise exception. 
-        return False
-                
-    def instruction(self, op, line, source):
-        if not op:
-            return None
-
-        if not line:
-            return Instruction(source, op, [])
-        
-        args = [arg.strip() for arg in line.split(',')]
-        return Instruction(source, op, args)

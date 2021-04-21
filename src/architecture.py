@@ -2,7 +2,7 @@
 REG   = 0
 IMM11 = 1
 IMM16 = 2
-IMM22 = 3
+IMM26 = 3
 PAD5  = 4
 
 REGISTERS = {
@@ -97,3 +97,6 @@ INSTRUCTIONS = [
     {'name': 'halt',  'opcode': '110110', 'format': []},
     {'name': 'henak',  'opcode': '111111', 'format': []}
 ]
+
+def get_instr_def(name):
+    return next(i for i in INSTRUCTIONS if i['name'] == name, None)
