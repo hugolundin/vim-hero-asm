@@ -1,4 +1,3 @@
-from exceptions.parse import parseException
 import logging
 
 class InstructionException(Exception):

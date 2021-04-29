@@ -85,7 +85,7 @@ INSTRUCTIONS = [
     {'name': 'bgt',   'opcode': '101011', 'format': [IMM26]},
     {'name': 'blteq', 'opcode': '101100', 'format': [IMM26]},
     {'name': 'bgteq', 'opcode': '101101', 'format': [IMM26]},
-    {'name': 'jmp',   'opcode': '101110', 'format': [PAD, REG, IMM16]},
+    {'name': 'jmp',   'opcode': '101110', 'format': [PAD5, REG, IMM16]},
     {'name': 'jmpi',  'opcode': '101111', 'format': [IMM26]},
 
     # Subroutines
@@ -99,4 +99,8 @@ INSTRUCTIONS = [
 ]
 
 def get_instr_def(name):
-    return next(i for i in INSTRUCTIONS if i['name'] == name, None)
+    for instruction in INSTRUCTIONS:
+        if instruction['name'] == name:
+            return instruction
+
+    return None

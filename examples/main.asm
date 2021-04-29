@@ -1,8 +1,8 @@
-.include "constants.asm"
-.include "init.asm"
+
+.constant END_VALUE 25
 
 loop:
-    dec r1
+    subi r1, r0, 1
     cmpi r1, END_VALUE
     bneq loop
 end:
