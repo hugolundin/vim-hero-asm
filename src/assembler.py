@@ -77,8 +77,8 @@ class Assembler:
             raise AssemblyException(f'{self.path}:{instruction.line}: missing argument')
 
         # Resolve constants.
-        if reg in self.parser.constants:
-            reg = self.parser.constants[reg]
+        if reg in self.parser.constants|self.parser.labels:
+            reg = (self.parser.constants|self.parser.labels)[reg]
 
         if reg in REGISTERS:
             result.extend(REGISTERS[reg])
@@ -95,4 +95,5 @@ class Assembler:
             imm = self.parser.constants[imm]
 
         value = simple_eval(imm, names=self.parser.labels|self.parser.constants)
-        result.extend(int2ba(value, length=size, endian='big'))
+        binary = int2ba(value, length=size, endian='big')
+        result.extend(binary)
