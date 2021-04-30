@@ -65,13 +65,17 @@ def test_simple():
         '101110_00000_00000_0000000000001001'
     ]
 
-    verify(program, machine_code)
+    # verify(program, machine_code)
 
 def test_label():
     program = inspect.cleandoc("""
-    START:
+        nop
+        nop
+    MAIN:
         addi r1, r0, 1
-        jmp START, 0
+        jmpi YOLO
+    YOLO:
+        nop
     """)
 
     machine_code = []

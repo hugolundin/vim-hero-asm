@@ -29,6 +29,7 @@ class Assembler:
         
         # First pass. Resolve pseudo instructions.
         for instruction in self.parser.instructions:
+            # TODO: hej
             pass
 
         # Second pass. Assemble instructions.
@@ -40,6 +41,8 @@ class Assembler:
             else:
                 raise AssemblyException(
                     f'{self.path}:{instruction.line}: unknown op "{instruction.name}"')
+
+            self.pc += 1
 
         return self.result.tobytes()
 
@@ -76,9 +79,9 @@ class Assembler:
         except IndexError:
             raise AssemblyException(f'{self.path}:{instruction.line}: missing argument')
 
-        # Resolve constants.
-        if reg in self.parser.constants|self.parser.labels:
-            reg = (self.parser.constants|self.parser.labels)[reg]
+        # Resolve aliases.
+        if reg in self.parser.aliases:
+            reg = self.parser.aliases[reg]
 
         if reg in REGISTERS:
             result.extend(REGISTERS[reg])
@@ -93,7 +96,11 @@ class Assembler:
 
         if imm in self.parser.constants:
             imm = self.parser.constants[imm]
-
-        value = simple_eval(imm, names=self.parser.labels|self.parser.constants)
+        elif imm in self.parser.labels:
+            # TODO: Add a zero to make it easier to do complex expressions? Maybe? 
+            imm = self.parser.labels[imm] - self.pc - 1
+        
+        # TODO: Negative offsets cannot be evaluated. 
+        value = simple_eval(imm)
         binary = int2ba(value, length=size, endian='big')
         result.extend(binary)

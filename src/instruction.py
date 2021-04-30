@@ -20,8 +20,8 @@ class Parser:
     def __init__(self):
         self.pc = 0
         self.labels = {}
+        self.aliases = {}
         self.constants = {}
-        self.directives = []
         self.instructions = []
         
     def __repr__(self):
@@ -47,6 +47,7 @@ class Parser:
             op, line = self.op(line)
 
             if op:
+                
                 if self.directive(op, index, line):
                     continue
 
@@ -68,16 +69,25 @@ class Parser:
             # TODO: Raise exception.
             return False
 
-        if op[0] != '.':
+        dot, directive = op[0] == '.', op[1:]
+
+        # TODO: Raise exception.
+        if not dot:
             return False
 
-        # TODO: Improve constant handling.
-        if op == '.constant':
+        # TODO: Raise exception.
+        if not directive:
+            return False
+
+        if directive == 'constant':
             key, value = line.split(' ', 1)
             self.constants[key] = value
             return True
 
-        # TODO: Add handling of other directives.
+        if directive == 'alias':
+            key, value = line.split(' ', 1)
+            self.aliases[key] = value
+            return True
 
         # TODO: Raise exception. 
         return False
