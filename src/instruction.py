@@ -21,7 +21,7 @@ class Parser:
         self.pc = 0
         self.labels = {}
         self.aliases = {'zero': 'r0'}
-        self.constants = {}
+        self.constants = {'pi': '3', 'e': '3', 'g': '10', 'henak': '718'}
         self.instructions = []
         
     def __repr__(self):

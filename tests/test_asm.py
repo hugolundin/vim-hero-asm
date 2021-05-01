@@ -88,14 +88,24 @@ def test_label():
         '101111_11111111111111111111111110'
     ]
 
-    verify(program, machine_code, debug=True)
+    verify(program, machine_code)
 
 def test_constant_expression():
     program = inspect.cleandoc("""
-    
-    addi r0, r1, 0
+    .constant EXPR 5 + 5
+    addi r0, r1, EXPR
     """)
 
     machine_code = []
-
     verify(program, machine_code)
+
+def test_pseudo():
+    program = inspect.cleandoc("""
+    inc r1
+    dec r0
+    henak718
+    """)
+
+    machine_code = []
+    verify(program, machine_code)
+

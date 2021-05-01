@@ -1,7 +1,7 @@
 from architecture import REG, IMM11, IMM16, IMM26, PAD5, REGISTERS, get_instr_def
 from simpleeval import simple_eval
 from bitarray.util import int2ba
-from instruction import Parser
+from instruction import Parser, Instruction
 from bitarray import bitarray
 import os
 
@@ -28,9 +28,20 @@ class Assembler:
         self.parser.parse(lines)
         
         # First pass. Resolve pseudo instructions.
-        for instruction in self.parser.instructions:
-            # TODO: hej
-            pass
+        # To limit the scope of this project, only
+        # instructions of equal length can be pseudoed. 
+        for index, instruction in enumerate(self.parser.instructions):
+            if instruction.name == 'inc':
+                self.parser.instructions[index] = Instruction(
+                    'addi', instruction.line, [instruction.args[0], instruction.args[0], '1'])
+
+            elif instruction.name == 'dec':
+                self.parser.instructions[index] = Instruction(
+                    'addi', instruction.line, [instruction.args[0], instruction.args[0], '-1'])
+
+            elif instruction.name == 'henak718':
+                self.parser.instructions[index] = Instruction(
+                    'jmpi', instruction.line, ['718'])
 
         # Second pass. Assemble instructions.
         for instruction in self.parser.instructions:
@@ -95,7 +106,7 @@ class Assembler:
             raise AssemblyException(f'{self.path}:{instruction.line}: missing argument')
 
         if imm.lower() in self.parser.constants:
-            value = simple_eval(self.parsesr.constants[imm])
+            value = simple_eval(self.parser.constants[imm.lower()])
         elif imm.lower() in self.parser.labels:
             value = self.parser.labels[imm.lower()] - self.pc - 1
         else:
