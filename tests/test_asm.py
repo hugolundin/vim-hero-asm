@@ -6,7 +6,7 @@ import tempfile
 from bitarray import bitarray
 from assembler import Assembler
 
-def verify(program, machine_code):
+def verify(program, machine_code, debug=False):
     """Verify that the given program assembles to the given machine code."""
 
     # Because the assembler expects a file path, we create a temporary file
@@ -19,6 +19,11 @@ def verify(program, machine_code):
     assembler = Assembler(path)
     data = bitarray()
     data.frombytes(assembler.assemble())
+
+    if debug:
+        print(f'Instructions: {assembler.parser.instructions}')
+        print(f'Constants: {assembler.parser.constants}')
+        print(f'Aliases: {assembler.parser.aliases}')
 
     # Go through and check that every 32 bits corresponds to the
     # given machine code. 
@@ -65,7 +70,7 @@ def test_simple():
         '101110_00000_00000_0000000000001001'
     ]
 
-    # verify(program, machine_code)
+    verify(program, machine_code)
 
 def test_label():
     program = inspect.cleandoc("""
@@ -73,9 +78,22 @@ def test_label():
         nop
     MAIN:
         addi r1, r0, 1
-        jmpi YOLO
-    YOLO:
-        nop
+        jmpi MAIN
+    """)
+
+    machine_code = [
+        '00000000000000000000000000000000',
+        '00000000000000000000000000000000',
+        '001011_00001_00000_0000000000000001',
+        '101111_11111111111111111111111110'
+    ]
+
+    verify(program, machine_code, debug=True)
+
+def test_constant_expression():
+    program = inspect.cleandoc("""
+    
+    addi r0, r1, 0
     """)
 
     machine_code = []

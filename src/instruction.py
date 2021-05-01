@@ -20,7 +20,7 @@ class Parser:
     def __init__(self):
         self.pc = 0
         self.labels = {}
-        self.aliases = {}
+        self.aliases = {'zero': 'r0'}
         self.constants = {}
         self.instructions = []
         
@@ -41,13 +41,12 @@ class Parser:
             # If we have a label, add it to the list of labels
             # at the current program counter index.
             if label:
-                self.labels[label] = self.pc
+                self.labels[label.lower()] = self.pc
 
             # Then we look for an operand...
             op, line = self.op(line)
 
             if op:
-                
                 if self.directive(op, index, line):
                     continue
 
@@ -66,8 +65,7 @@ class Parser:
 
     def directive(self, op, index, line):
         if not op:
-            # TODO: Raise exception.
-            return False
+            raise ParseException('Invalid state, op should always exist here.')
 
         dot, directive = op[0] == '.', op[1:]
 
@@ -81,12 +79,12 @@ class Parser:
 
         if directive == 'constant':
             key, value = line.split(' ', 1)
-            self.constants[key] = value
+            self.constants[key.lower()] = value
             return True
 
         if directive == 'alias':
             key, value = line.split(' ', 1)
-            self.aliases[key] = value
+            self.aliases[key.lower()] = value
             return True
 
         # TODO: Raise exception. 

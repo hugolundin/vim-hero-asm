@@ -80,8 +80,8 @@ class Assembler:
             raise AssemblyException(f'{self.path}:{instruction.line}: missing argument')
 
         # Resolve aliases.
-        if reg in self.parser.aliases:
-            reg = self.parser.aliases[reg]
+        if reg.lower() in self.parser.aliases:
+            reg = self.parser.aliases[reg.lower()]
 
         if reg in REGISTERS:
             result.extend(REGISTERS[reg])
@@ -94,13 +94,12 @@ class Assembler:
         except IndexError:
             raise AssemblyException(f'{self.path}:{instruction.line}: missing argument')
 
-        if imm in self.parser.constants:
-            imm = self.parser.constants[imm]
-        elif imm in self.parser.labels:
-            # TODO: Add a zero to make it easier to do complex expressions? Maybe? 
-            imm = self.parser.labels[imm] - self.pc - 1
-        
-        # TODO: Negative offsets cannot be evaluated. 
-        value = simple_eval(imm)
-        binary = int2ba(value, length=size, endian='big')
+        if imm.lower() in self.parser.constants:
+            value = simple_eval(self.parsesr.constants[imm])
+        elif imm.lower() in self.parser.labels:
+            value = self.parser.labels[imm.lower()] - self.pc - 1
+        else:
+            value = simple_eval(imm)
+            
+        binary = int2ba(value, length=size, endian='big', signed=True)
         result.extend(binary)
