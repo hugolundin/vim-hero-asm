@@ -107,19 +107,22 @@ class Assembler:
             raise AssemblyException(f'{self.path}:{instruction.line}: missing argument')
 
         if imm.lower() in self.parser.constants:
-            value = simple_eval(self.parser.constants[imm.lower()])
+            imm = f'{self.parser.constants[imm.lower()]}'
         elif imm.lower() in self.parser.labels:
-            value = self.parser.labels[imm.lower()] - self.pc - 1
-        else:
-            if imm[0] == 'b':
-                binary = Bits(bin=imm[2:-1]).int
-                value = simple_eval(f'{binary}')
-            elif imm[0] == 'x':
-                hexadecimal = Bits(hex=imm[2:-1].int)
-                value = simple_eval(f'{binary}')
+            if instruction.name == 'jmpi':
+                imm = f'{self.parser.labels[imm.lower()] - self.pc - 1}'
             else:
-                value = simple_eval(imm)
-        
+                imm = f'{self.parser.labels[imm.lower()] - 1}'
+
+        if imm[0] == 'b':
+            binary = Bits(bin=imm[2:-1]).int
+            value = simple_eval(f'{binary}')
+        elif imm[0] == 'x':
+            hexadecimal = Bits(hex=imm[2:-1].int)
+            value = simple_eval(f'{binary}')
+        else:
+            value = simple_eval(imm)
+
         signed = True if value < 0 else False
         binary = int2ba(value, length=size, endian='big', signed=signed)
         result.extend(binary)

@@ -79,12 +79,12 @@ class Parser:
 
         if directive == 'constant':
             key, value = line.split(' ', 1)
-            self.constants[key.lower()] = value
+            self.constants[key.lower().strip()] = value.strip()
             return True
 
         if directive == 'alias':
             key, value = line.split(' ', 1)
-            self.aliases[key.lower()] = value
+            self.aliases[key.lower().strip()] = value.strip()
             return True
 
         # TODO: Raise exception. 

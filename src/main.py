@@ -43,7 +43,7 @@ if __name__ == '__main__':
         else:
             if args.vhdl:
                 with open('program.vhd', 'w') as output:
-                    output.write(vhdl.from_data(assembler.parser.instructions, data))
+                    output.write(vhdl.from_data(assembler.parser, data))
             else:
                 with open(destination, 'wb') as output:
                     output.write(data.tobytes())
