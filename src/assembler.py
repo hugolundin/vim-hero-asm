@@ -3,6 +3,7 @@ from simpleeval import simple_eval
 from bitarray.util import int2ba
 from instruction import Parser, Instruction
 from bitarray import bitarray
+from bitstring import Bits
 import os
 
 INSTRUCTION_LEN = 32
@@ -55,7 +56,7 @@ class Assembler:
 
             self.pc += 1
 
-        return self.result.tobytes()
+        return self.result
 
     def instruction(self, instruction, definition):
         index = 0
@@ -110,7 +111,15 @@ class Assembler:
         elif imm.lower() in self.parser.labels:
             value = self.parser.labels[imm.lower()] - self.pc - 1
         else:
-            value = simple_eval(imm)
-            
-        binary = int2ba(value, length=size, endian='big', signed=True)
+            if imm[0] == 'b':
+                binary = Bits(bin=imm[2:-1]).int
+                value = simple_eval(f'{binary}')
+            elif imm[0] == 'x':
+                hexadecimal = Bits(hex=imm[2:-1].int)
+                value = simple_eval(f'{binary}')
+            else:
+                value = simple_eval(imm)
+        
+        signed = True if value < 0 else False
+        binary = int2ba(value, length=size, endian='big', signed=signed)
         result.extend(binary)
