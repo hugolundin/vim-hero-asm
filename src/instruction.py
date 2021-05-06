@@ -1,3 +1,5 @@
+from architecture import ALIASES, CONSTANTS
+
 class InstructionException(Exception):
     pass
 
@@ -6,20 +8,21 @@ class ParseException(Exception):
     pass
 
 class Instruction:
-    def __init__(self, name, line, args=[]):
+    def __init__(self, name, line, args, source_line):
         self.name = name
         self.line = line
         self.args = args
+        self.source_line = source_line
 
     def __repr__(self):
         return str(self.__dict__)
 
-class Parser:
+class InstructionParser:
     def __init__(self):
         self.pc = 0
         self.labels = {}
-        self.aliases = {'zero': 'r0'}
-        self.constants = {'pi': '3', 'e': '3', 'g': '10', 'henak': '718'}
+        self.aliases = dict(ALIASES)
+        self.constants = dict(CONSTANTS)
         self.instructions = []
         
     def __repr__(self):
@@ -28,13 +31,13 @@ class Parser:
     def parse(self, lines):
         self.pc = 0
 
-        for index, line in enumerate(lines, start=1):
+        for index, source_line in enumerate(lines, start=1):
             
             # Start by discarding the comment. 
-            line = self.erase_comment(line)
+            source_line = self.erase_comment(source_line)
 
             # Fetch the label. 
-            label, line = self.label(line)
+            label, line = self.label(source_line)
 
             # If we have a label, add it to the list of labels
             # at the current program counter index.
@@ -48,7 +51,7 @@ class Parser:
                 if self.directive(op, index, line):
                     continue
 
-                instruction = self.instruction(op, index, line)
+                instruction = self.instruction(op, index, line, source_line)
 
                 if instruction:
                     self.instructions.append(instruction)
@@ -88,14 +91,14 @@ class Parser:
         # TODO: Raise exception. 
         return False
 
-    def instruction(self, op, index, line):
+    def instruction(self, op, index, line, source_line):
         if not op:
             return None
 
         if not line:
-            return Instruction(op, index, [])
+            return Instruction(op, index, [], source_line)
         
-        return Instruction(op, index, [arg.strip() for arg in line.split(',')])
+        return Instruction(op, index, [arg.strip() for arg in line.split(',')], source_line)
 
     def erase_comment(self, line):
         if not line:

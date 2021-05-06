@@ -14,7 +14,7 @@ def format_args(args):
 def get_line_name(parser, index):
     for label, line in parser.labels.items():
         if line == index:
-            return f'{index} ({label})'
+            return f'{index} [{label.upper()}]'
 
     return f'{index}'
 

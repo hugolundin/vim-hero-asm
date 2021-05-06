@@ -10,7 +10,7 @@ def describe_data(data):
     return f'{length} bytes'
 
 def message(title, msg, color):
-    print(f'assembler: {color}{colorama.Style.BRIGHT}{title}: {colorama.Style.RESET_ALL}{msg}')
+    print(f'{color}{colorama.Style.BRIGHT}{title}: {colorama.Style.RESET_ALL}{msg}')
 
 def info(msg):
     message('Info', msg, colorama.Fore.MAGENTA)

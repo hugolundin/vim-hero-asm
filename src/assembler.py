@@ -1,8 +1,8 @@
-from architecture import REG, IMM11, IMM16, IMM26, PAD5, REGISTERS, INSTRUCTIONS, get_instr_def
+from architecture import REG, IMM11, IMM16, IMM26, PAD5, REGISTERS, INSTRUCTIONS, BRANCH_INSTRUCTIONS, RELATIVE_BRANCH_INSTRUCTIONS, get_instr_def
 from utilities import info, warning, error
 from simpleeval import simple_eval
 from bitarray.util import int2ba
-from instruction import Parser, Instruction
+from instruction import Instruction, InstructionParser
 from bitarray import bitarray
 from bitstring import Bits
 import os
@@ -16,7 +16,7 @@ class AssemblyException(Exception):
 class Assembler:
     def __init__(self, path):
         self.pc = 0
-        self.parser = Parser()
+        self.parser = InstructionParser()
         self.result = bitarray()
         self.path = os.path.abspath(path)
 
@@ -46,11 +46,24 @@ class Assembler:
                     'jmpi', instruction.line, ['718'])
 
         # Second pass. Assemble instructions.
-        for instruction in self.parser.instructions:
+        for index, instruction in enumerate(self.parser.instructions):
             definition = get_instr_def(INSTRUCTIONS, instruction.name)
 
             if definition:
                 self.instruction(instruction, definition)
+
+                # If the current instruction is a branch instruction, 
+                # we want to check that it is not placed in the delay
+                # slot of a previous branch instruction. 
+                if get_instr_def(BRANCH_INSTRUCTIONS, instruction.name):
+
+                    # The first instruction does not have a previous one. 
+                    if index > 0:
+                        previous = self.parser.instructions[index-1]
+
+                        if get_instr_def(BRANCH_INSTRUCTIONS, previous.name):
+                            message = f'{previous.source_line} (line {previous.line}) has a branch instruction ({instruction.source_line}) in its delay slot.'
+                            warning(message)
             else:
                 raise AssemblyException(
                     f'{self.path}:{instruction.line}: unknown op "{instruction.name}"')
@@ -109,11 +122,11 @@ class Assembler:
 
         if imm.lower() in self.parser.constants:
             imm = f'{self.parser.constants[imm.lower()]}'
-        elif imm.lower() in self.parser.labels:
-            if instruction.name == 'jmpi':
+        elif imm.lower() in self.parser.labels:            
+            if get_instr_def(RELATIVE_BRANCH_INSTRUCTIONS, instruction.name):
                 imm = f'{self.parser.labels[imm.lower()] - self.pc - 1}'
             else:
-                imm = f'{self.parser.labels[imm.lower()] - 1}'
+                imm = f'{self.parser.labels[imm.lower()]}'
 
         if imm[0] == 'b':
             binary = Bits(bin=imm[2:-1]).int

@@ -80,16 +80,21 @@ COMPARE_INSTRUCTIONS = [
     {'name': 'cmpi', 'opcode': '100100', 'format': [PAD5, REG, IMM16]}
 ]
 
-BRANCH_INSTRUCTIONS = [
+RELATIVE_BRANCH_INSTRUCTIONS = [
     {'name': 'beq',   'opcode': '101000', 'format': [IMM26]},
     {'name': 'bneq',  'opcode': '101001', 'format': [IMM26]},
     {'name': 'blt',   'opcode': '101010', 'format': [IMM26]},
     {'name': 'bgt',   'opcode': '101011', 'format': [IMM26]},
     {'name': 'blteq', 'opcode': '101100', 'format': [IMM26]},
     {'name': 'bgteq', 'opcode': '101101', 'format': [IMM26]},
-    {'name': 'jmp',   'opcode': '101110', 'format': [PAD5, REG, IMM16]},
     {'name': 'jmpi',  'opcode': '101111', 'format': [IMM26]}
 ]
+
+DYNAMIC_BRANCH_INSTRUCTIONS = [
+    {'name': 'jmp',   'opcode': '101110', 'format': [PAD5, REG, IMM16]},
+]
+
+BRANCH_INSTRUCTIONS = RELATIVE_BRANCH_INSTRUCTIONS + DYNAMIC_BRANCH_INSTRUCTIONS
 
 SUBROUTINE_INSTRUCTIONS = [
     {'name': 'call', 'opcode': '110001', 'format': [REG, REG, REG]},
@@ -118,3 +123,16 @@ def get_instr_def(instructions, name):
             return instruction
 
     return None
+
+ALIASES = {
+    'zero': 'r0',
+    'ret' : 'r31'
+}
+
+IO_BASE_ADDR = 1024
+
+CONSTANTS = {
+    'HENAK'        :  '718',
+    'LEDS_ADDR'    : f'{IO_BASE_ADDR}',
+    'KEYBOARD_ADDR': f'{IO_BASE_ADDR + 1}'
+}
