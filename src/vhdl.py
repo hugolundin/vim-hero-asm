@@ -1,4 +1,4 @@
-from architecture import get_instr_def, REG, IMM11, IMM16, IMM26, PAD5
+from architecture import get_instr_def, REG, IMM11, IMM16, IMM26, PAD5, INSTRUCTIONS
 import inspect
 
 def format_args(args):
@@ -37,7 +37,7 @@ def from_data(parser, data):
         result += f'{data[offset:offset+6].to01()}'
         offset += 6
 
-        for d in get_instr_def(instruction.name)['format']:
+        for d in get_instr_def(INSTRUCTIONS, instruction.name)['format']:
             if d == REG:
                 result += f'_{data[offset:offset+5].to01()}'
                 offset += 5

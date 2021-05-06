@@ -40,43 +40,47 @@ REGISTERS = {
     'r31'   : '11111'
 }
 
-INSTRUCTIONS = [
-    # Load / Store
+LOAD_STORE_INSTRUCTIONS = [
     {'name': 'ld',    'opcode': '000001', 'format': [REG, REG, IMM16]},
     {'name': 'str',   'opcode': '000010', 'format': [PAD5, REG, REG, IMM11]},
     {'name': 'mov',   'opcode': '000011', 'format': [REG, REG]},
     {'name': 'movhi', 'opcode': '000100', 'format': [REG, IMM16]},
     {'name': 'movli', 'opcode': '000101', 'format': [REG, IMM16]},
     {'name': 'push',  'opcode': '000110', 'format': [PAD5, REG]},
-    {'name': 'pop',   'opcode': '000111', 'format': [REG]},
+    {'name': 'pop',   'opcode': '000111', 'format': [REG]}
+]
 
-    # Arihmetic
+ARITHMETIC_INSTRUCTIONS = [
     {'name': 'add',   'opcode': '001010', 'format': [REG, REG, REG]},
     {'name': 'addi',  'opcode': '001011', 'format': [REG, REG, IMM16]},
     {'name': 'sub',   'opcode': '001100', 'format': [REG, REG, REG]},
     {'name': 'subi',  'opcode': '001101', 'format': [REG, REG, IMM16]},
     {'name': 'mul',   'opcode': '001110', 'format': [REG, REG, REG]},
-    {'name': 'muli',  'opcode': '001111', 'format': [REG, REG, IMM16]},
+    {'name': 'muli',  'opcode': '001111', 'format': [REG, REG, IMM16]}
+]
 
-    # Shift
+SHIFT_INSTRUCTIONS = [
     {'name': 'lsl',  'opcode': '010100', 'format': [REG, REG]},
     {'name': 'asl',  'opcode': '010101', 'format': [REG, REG]},
     {'name': 'lsr',  'opcode': '010110', 'format': [REG, REG]},
-    {'name': 'asr',  'opcode': '010111', 'format': [REG, REG]},
+    {'name': 'asr',  'opcode': '010111', 'format': [REG, REG]}
+]
 
-    # Logic
+LOGIC_INSTRUCTIONS = [
     {'name': 'and',  'opcode': '011010', 'format': [REG, REG, REG]},
     {'name': 'andi', 'opcode': '011011', 'format': [REG, REG, IMM16]},
     {'name': 'or',   'opcode': '011100', 'format': [REG, REG, REG]},
     {'name': 'ori',  'opcode': '011101', 'format': [REG, REG, IMM16]},
     {'name': 'not',  'opcode': '011110', 'format': [REG, REG]},
     {'name': 'xor',  'opcode': '011111', 'format': [REG, REG, REG]},
+]
 
-    # Compare
+COMPARE_INSTRUCTIONS = [
     {'name': 'cmp',  'opcode': '100011', 'format': [PAD5, REG, REG]},
-    {'name': 'cmpi', 'opcode': '100100', 'format': [PAD5, REG, IMM16]},
+    {'name': 'cmpi', 'opcode': '100100', 'format': [PAD5, REG, IMM16]}
+]
 
-    # Branch
+BRANCH_INSTRUCTIONS = [
     {'name': 'beq',   'opcode': '101000', 'format': [IMM26]},
     {'name': 'bneq',  'opcode': '101001', 'format': [IMM26]},
     {'name': 'blt',   'opcode': '101010', 'format': [IMM26]},
@@ -84,20 +88,32 @@ INSTRUCTIONS = [
     {'name': 'blteq', 'opcode': '101100', 'format': [IMM26]},
     {'name': 'bgteq', 'opcode': '101101', 'format': [IMM26]},
     {'name': 'jmp',   'opcode': '101110', 'format': [PAD5, REG, IMM16]},
-    {'name': 'jmpi',  'opcode': '101111', 'format': [IMM26]},
+    {'name': 'jmpi',  'opcode': '101111', 'format': [IMM26]}
+]
 
-    # Subroutines
+SUBROUTINE_INSTRUCTIONS = [
     {'name': 'call', 'opcode': '110001', 'format': [REG, REG, REG]},
-    {'name': 'ret',  'opcode': '110010', 'format': [REG, REG, REG]},
-   
-    # Other
+    {'name': 'ret',  'opcode': '110010', 'format': [REG, REG, REG]}
+]
+
+OTHER_INSTRUCTIONS = [
     {'name': 'nop',  'opcode': '000000', 'format': []},
     {'name': 'halt',  'opcode': '110110', 'format': []},
     {'name': 'henak',  'opcode': '111111', 'format': []}
 ]
 
-def get_instr_def(name):
-    for instruction in INSTRUCTIONS:
+INSTRUCTIONS = \
+    LOAD_STORE_INSTRUCTIONS + \
+    ARITHMETIC_INSTRUCTIONS + \
+    SHIFT_INSTRUCTIONS      + \
+    LOGIC_INSTRUCTIONS      + \
+    COMPARE_INSTRUCTIONS    + \
+    BRANCH_INSTRUCTIONS     + \
+    SUBROUTINE_INSTRUCTIONS + \
+    OTHER_INSTRUCTIONS
+
+def get_instr_def(instructions, name):
+    for instruction in instructions:
         if instruction['name'] == name:
             return instruction
 

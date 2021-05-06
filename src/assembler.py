@@ -1,4 +1,5 @@
-from architecture import REG, IMM11, IMM16, IMM26, PAD5, REGISTERS, get_instr_def
+from architecture import REG, IMM11, IMM16, IMM26, PAD5, REGISTERS, INSTRUCTIONS, get_instr_def
+from utilities import info, warning, error
 from simpleeval import simple_eval
 from bitarray.util import int2ba
 from instruction import Parser, Instruction
@@ -46,7 +47,7 @@ class Assembler:
 
         # Second pass. Assemble instructions.
         for instruction in self.parser.instructions:
-            definition = get_instr_def(instruction.name)
+            definition = get_instr_def(INSTRUCTIONS, instruction.name)
 
             if definition:
                 self.instruction(instruction, definition)
