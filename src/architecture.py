@@ -132,6 +132,7 @@ ALIASES = {
 IO_BASE_ADDR = 1024
 
 CONSTANTS = {
+<<<<<<< HEAD
     'henak'                             :  '718',
     'leds_address'                      : f'{IO_BASE_ADDR}',
     'keyboard_address'                  : f'{IO_BASE_ADDR + 1}',
@@ -141,4 +142,9 @@ CONSTANTS = {
     'sprite_register_tick_address'      : f'{IO_BASE_ADDR + 5}',
     'sprite_register_data_address'      : f'{IO_BASE_ADDR + 6}',
     'sprite_register_notes_hit_address' : f'{IO_BASE_ADDR + 7}'
+=======
+    'HENAK'        : '718',
+    'LEDS_ADDR'    : str(IO_BASE_ADDR),
+    'KEYBOARD_ADDR': str(IO_BASE_ADDR + 1) 
+>>>>>>> 66919e0 (Add generate_data)
 }

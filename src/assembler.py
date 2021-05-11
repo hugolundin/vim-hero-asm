@@ -17,7 +17,8 @@ class Assembler:
     def __init__(self, path):
         self.pc = 0
         self.parser = InstructionParser()
-        self.result = bitarray()
+        self.data = bitarray()
+        self.program = bitarray()
         self.path = os.path.abspath(path)
 
     @staticmethod
@@ -25,7 +26,7 @@ class Assembler:
         with open(path, 'r') as s:
             return [line.strip() for line in s.read().split('\n')]
 
-    def assemble(self) -> bytes:
+    def assemble(self):
         lines = self.load(self.path)
         self.parser.parse(lines)
         
@@ -70,7 +71,7 @@ class Assembler:
 
             self.pc += 1
 
-        return self.result
+        return self.program, self.data
 
     def instruction(self, instruction, definition):
         index = 0
@@ -98,7 +99,7 @@ class Assembler:
 
         padding = INSTRUCTION_LEN - len(result)
         result.extend('0' * padding) 
-        self.result.extend(result)
+        self.program.extend(result)
 
     def reg(self, instruction, index, result):
         try:

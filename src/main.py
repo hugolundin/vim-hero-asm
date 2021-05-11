@@ -24,8 +24,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '--vhdl',
         help='Assemble the file and write the result as a vhdl array.',
-        action='store_true'
-    )
+        action='store_true')
 
     parser.add_argument(
         'file',
@@ -33,18 +32,31 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     assembler = Assembler(args.file)
-    data = assembler.assemble()
-
-    destination = f'{Path(args.file).stem}.dat'
+    program, data = assembler.assemble()
+    
+    program_destination = f'{Path(args.file).stem}.program'
+    data_destination = f'{Path(args.file).stem}.data'
 
     if not args.assemble:
         if args.stdout:
-            sys.stdout.buffer.write(data)
+            sys.stdout.buffer.write(program)
+
+            if len(data) > 0:
+                sys.stdout.buffer.write(data)
         else:
             if args.vhdl:
                 with open('program.vhd', 'w') as output:
-                    output.write(vhdl.from_data(assembler.parser, data))
+                    output.write(vhdl.generate_program(assembler.parser, program))
+
+                if len(data) > 0:
+                    with open('data.vhd', 'w') as output:
+                        output.write(vhdl.generate_data(data))
             else:
-                with open(destination, 'wb') as output:
-                    output.write(data.tobytes())
-                    logging.debug(f'Wrote {describe_data(data)} to {destination}')
+                with open(program_destination, 'wb') as output:
+                    output.write(program.tobytes())
+                    logging.debug(f'Wrote {describe_data(program)} to {program_destination}')
+
+                if len(data) > 0:
+                    with open(data_destination, 'wb') as output:
+                        output.write(data.tobytes())
+                        logging.debug(f'Wrote {describe_data(data)} to {data_destination}')

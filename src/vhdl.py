@@ -18,7 +18,7 @@ def get_line_name(parser, index):
 
     return f'{index}'
 
-def from_data(parser, data):
+def generate_program(parser, data):
     result = inspect.cleandoc("""
     library ieee;
     use ieee.std_logic_1164.all;
@@ -61,4 +61,21 @@ def from_data(parser, data):
         result += f'",\n\n'
 
     result += "        others => (others => '0')\n    );\nend program;\n"
+    return result
+
+def generate_data(data):
+    result = inspect.cleandoc("""
+    library ieee;
+    use ieee.std_logic_1164.all;
+    use ieee.numeric_std.all;
+
+    package data is
+    """)
+
+    result += "\n    type data_memory_t is array(0 to DATA_MEMORY_SIZE-1) of unsigned (31 downto 0);\n\n"
+    result += '    constant data_memory_c: data_memory_t := (\n\n'
+    
+    # TODO: Write data to result.
+
+    result += "        others => (others => '0')\n    );\nend data;\n"
     return result
