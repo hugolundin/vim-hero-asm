@@ -77,6 +77,7 @@ class Assembler:
         result = bitarray(definition['opcode'])
         
         for d in definition['format']:
+
             if d == REG:
                 self.reg(instruction, index, result)
                 index += 1
@@ -133,7 +134,7 @@ class Assembler:
             value = simple_eval(f'{binary}')
         elif imm[0] == 'x':
             hexadecimal = Bits(hex=imm[2:-1].int)
-            value = simple_eval(f'{binary}')
+            value = simple_eval(f'{hexadecimal}')
         else:
             value = simple_eval(imm)
 
