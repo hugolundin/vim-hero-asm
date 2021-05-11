@@ -134,11 +134,11 @@ IO_BASE_ADDR = 1024
 CONSTANTS = {
     'HENAK'                             :  '718',
     'LEDS_ADDRESS'                      : f'{IO_BASE_ADDR}',
-    'KEYBOARD_ADDRESS'                  : f'{IO_BASE_ADDR + 1}'
-    'SOUND_ADDRESS'                     : f'{IO_BASE_ADDR + 2}'
-    'BUTTONS_PRESSED_ADDRESS'           : f'{IO_BASE_ADDR + 3}'
-    'VGA_SCORE_ADDRESS'                 : f'{IO_BASE_ADDR + 4}'
-    'SPRITE_REGISTER_TICK_ADDRESS'      : f'{IO_BASE_ADDR + 5}'
-    'SPRITE_REGISTER_DATA_ADDRESS'      : f'{IO_BASE_ADDR + 6}'
+    'KEYBOARD_ADDRESS'                  : f'{IO_BASE_ADDR + 1}',
+    'SOUND_ADDRESS'                     : f'{IO_BASE_ADDR + 2}',
+    'BUTTONS_PRESSED_ADDRESS'           : f'{IO_BASE_ADDR + 3}',
+    'VGA_SCORE_ADDRESS'                 : f'{IO_BASE_ADDR + 4}',
+    'SPRITE_REGISTER_TICK_ADDRESS'      : f'{IO_BASE_ADDR + 5}',
+    'SPRITE_REGISTER_DATA_ADDRESS'      : f'{IO_BASE_ADDR + 6}',
     'SPRITE_REGISTER_NOTES_HIT_ADDRESS' : f'{IO_BASE_ADDR + 7}'
 }
