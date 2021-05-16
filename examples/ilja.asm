@@ -2,8 +2,8 @@
 .alias RETURN r29
 .alias SLEEP_REG r30
 
-.constant SLEEP_DURATION 16
-# -- SPRITE_REGISTER_DATA
+.constant SLEEP_DURATION -0b101010001_10_1010
+
 START:
     movli REG_WITH_ONE, 1
 
@@ -16,7 +16,7 @@ START:
     nop
 
 SLEEP:
-    movhi SLEEP_REG, SLEEP_DURATION
+    movhi SLEEP_REG, SLEEP_DURATION ; this is a comment
     subi SLEEP_REG, SLEEP_REG, 1
     cmpi SLEEP_REG, 0
     bneq SLEEP

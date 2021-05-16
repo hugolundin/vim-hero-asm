@@ -124,21 +124,14 @@ class Assembler:
 
         if imm.lower() in self.parser.constants:
             imm = f'{self.parser.constants[imm.lower()]}'
-        elif imm.lower() in self.parser.labels:            
+
+        elif imm.lower() in self.parser.labels:
+           
             if get_instr_def(RELATIVE_BRANCH_INSTRUCTIONS, instruction.name):
                 imm = f'{self.parser.labels[imm.lower()] - self.pc - 1}'
             else:
                 imm = f'{self.parser.labels[imm.lower()]}'
 
-        if imm[0] == 'b':
-            binary = Bits(bin=imm[2:-1]).int
-            value = simple_eval(f'{binary}')
-        elif imm[0] == 'x':
-            hexadecimal = Bits(hex=imm[2:-1].int)
-            value = simple_eval(f'{hexadecimal}')
-        else:
-            value = simple_eval(imm)
-
-        signed = True if value < 0 else False
-        binary = int2ba(value, length=size, endian='big', signed=signed)
+        value = simple_eval(imm)
+        binary = int2ba(value, length=size, endian='big', signed=True if value < 0 else False)
         result.extend(binary)

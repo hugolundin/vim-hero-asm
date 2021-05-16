@@ -1,8 +1,4 @@
-nop
-nop
-nop
-addi r0, r0, YOLO
-nop
-nop
-YOLO:
-    nop
+.byte hej 5
+.word hej 32
+.data "external.dat"
+

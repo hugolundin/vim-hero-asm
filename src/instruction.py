@@ -7,6 +7,15 @@ class ParseException(Exception):
     """Raised when an error occurs while tokenizing."""
     pass
 
+TOKEN_COMMENT = ';'
+DIRECTIVE_ALIAS = 'alias'
+DIRECTIVE_CONSTANT = 'constant'
+
+DIRECTIVE_DATA = 'data'
+DIRECTIVE_DATA_BYTE = 'byte'
+DIRECTIVE_DATA_WORD = 'word'
+DIRECTIVE_DATA_EXTERNAL = 'external'
+
 class Instruction:
     def __init__(self, name, line, args, source_line):
         self.name = name
@@ -70,27 +79,25 @@ class InstructionParser:
 
         dot, directive = op[0] == '.', op[1:]
 
-        # TODO: Raise exception.
         if not dot:
             return False
 
-        # TODO: Raise exception.
         if not directive:
-            return False
+            raise ParseException(f'Expected directive after ".": {line}')
 
-        if directive == 'constant':
-            key, value = line.split(' ', 1)
+        key, value = line.split(' ', 1)
+
+        if directive == DIRECTIVE_CONSTANT:
             self.constants[key.lower().strip()] = value.strip()
-            return True
-
-        if directive == 'alias':
-            key, value = line.split(' ', 1)
+        elif directive == DIRECTIVE_ALIAS:
             self.aliases[key.lower().strip()] = value.strip()
-            return True
+        elif directive == DIRECTIVE_DATA:
+            pass
+        else:
+            raise ParseException(f'Unknown directive: {line}')
 
-        # TODO: Raise exception. 
-        return False
-
+        return True
+            
     def instruction(self, op, index, line, source_line):
         if not op:
             return None
@@ -104,7 +111,7 @@ class InstructionParser:
         if not line:
             return None
 
-        s = line.split('#', 1)
+        s = line.split(TOKEN_COMMENT, 1)
 
         if len(s) > 1:
             return s[0]
