@@ -63,6 +63,14 @@ def generate_program(parser, data):
     result += "        others => (others => '0')\n    );\nend program;\n"
     return result
 
+def get_index_name(parser, index):
+    for label, line in parser.data_labels.items():
+        if line == index:
+            return f'{index} [{label.upper()}]'
+
+    return f'{index}'
+
+
 def generate_data(parser, data):
     result = inspect.cleandoc("""
     library ieee;
@@ -75,18 +83,17 @@ def generate_data(parser, data):
     result += "\n    type data_memory_t is array(0 to DATA_MEMORY_SIZE-1) of unsigned (31 downto 0);\n\n"
     result += '    constant data_memory_c: data_memory_t := (\n\n'
 
-    if len(data) % 32 != 0:
-        data.extend([False]*(32 - (len(data) % 32)))
+    for i in range(len(parser.data)):
+        result += f'        -- {get_index_name(parser, i)}: {parser.data[i]}\n'
 
-    for i in range(len(data) // 32):
-        result += '        b"'
-        delimiter=''
+        # TODO: Fix...
+        result += f'        b"{data[i * 31: i * 31 + 7].to01()}'
+        result += f'_{data[(i * 32) + 9: (i * 32) + 17].to01()}'
+        result += f'_{data[(i * 32) + 18: (i *32) + 26].to01()}'
+        result += f'_{data[(i * 32) + 23: (i * 32) + 31].to01()}'
+        result += '",\n\n'
 
-        for j in range(4):
-            result += f'{delimiter}{data[(i*32 + j*8):(i*32 + j*8 + 7)].to01()}'
-            delimiter = '_'
-
-        result += '",\n'
+        print(result)
 
     result += "        others => (others => '0')\n    );\nend data;\n"
     return result

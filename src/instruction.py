@@ -1,3 +1,5 @@
+from bitarray import bitarray
+
 from architecture import ALIASES, CONSTANTS
 
 class InstructionException(Exception):
@@ -8,13 +10,9 @@ class ParseException(Exception):
     pass
 
 TOKEN_COMMENT = ';'
+DIRECTIVE_DATA = 'data'
 DIRECTIVE_ALIAS = 'alias'
 DIRECTIVE_CONSTANT = 'constant'
-
-DIRECTIVE_DATA = 'data'
-DIRECTIVE_DATA_BYTE = 'byte'
-DIRECTIVE_DATA_WORD = 'word'
-DIRECTIVE_DATA_EXTERNAL = 'external'
 
 class Instruction:
     def __init__(self, name, line, args, source_line):
@@ -22,14 +20,6 @@ class Instruction:
         self.line = line
         self.args = args
         self.source_line = source_line
-
-    def __repr__(self):
-        return str(self.__dict__)
-
-class Data:
-    def __init__(self, value, size):
-        self.value = value
-        self.size = size
 
     def __repr__(self):
         return str(self.__dict__)
@@ -102,25 +92,22 @@ class InstructionParser:
         elif directive == DIRECTIVE_ALIAS:
             self.aliases[key.lower().strip()] = value.strip()
         elif directive == DIRECTIVE_DATA:
-            name, value = value.split(' ', 1)
 
-            if key == DIRECTIVE_DATA_BYTE:
-                data = Data(value, 8)
-                self.data.append(data)
-                self.data_labels[name] = len(self.data) - 1
-            elif key == DIRECTIVE_DATA_WORD:
-                data = Data(value, 32)
-                self.data.append(data)
-                self.data_labels[name] = len(self.data) - 1
-            elif key == DIRECTIVE_DATA_EXTERNAL:
+            if value.startswith('"'):
                 with open(value[1:-1], 'rb') as ext:
-                    bytes = bytearray(ext.read())
-                    self.data_labels[name] = len(self.data)
+                    b = bitarray()
+                    b.frombytes(ext.read())
 
-                    for byte in bytes:
-                        self.data.append(Data(f'{byte}', 8))
+                    if len(b) % 32 != 0:
+                        b.extend([False]*(32 - (len(b) % 32)))
+                    
+                    for i in range(len(b) // 32):
+                        self.data.append(f'0b{b[i * 32:(i + 1) * 32].to01()}')
+
+                    self.data_labels[key] = len(self.data) - 1 
             else:
-                raise ParseException(f'Unknown data directive: {key}')
+                self.data.append(value)
+                self.data_labels[key] = len(self.data) - 1
         else:
             raise ParseException(f'Unknown directive: {directive}')
 

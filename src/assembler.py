@@ -33,8 +33,8 @@ class Assembler:
         # First pass. Build resulting data file. 
         if len(self.parser.data) > 0:
             for data in self.parser.data:
-                value = simple_eval(data.value)
-                binary = int2ba(value, length=data.size, endian='big', signed=True if value < 0 else False)
+                value = simple_eval(data)
+                binary = int2ba(value, length=32, endian='big', signed=True if value < 0 else False)
                 self.data.extend(binary)
         
         # Second pass. Resolve pseudo instructions.

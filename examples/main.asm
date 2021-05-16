@@ -5,8 +5,6 @@
 
 ;.data external song "song.dat"
 
-.data word hej 0xFF
-.data word hej1 0xFF
-.data word hej2 0xFF
-.data word hej3 0xFF
-.data byte hej4 0xFF
+.data hej 0xFF
+.data yolo "song.dat"
+.data nope 0
