@@ -63,7 +63,7 @@ def generate_program(parser, data):
     result += "        others => (others => '0')\n    );\nend program;\n"
     return result
 
-def generate_data(data):
+def generate_data(parser, data):
     result = inspect.cleandoc("""
     library ieee;
     use ieee.std_logic_1164.all;
@@ -74,8 +74,19 @@ def generate_data(data):
 
     result += "\n    type data_memory_t is array(0 to DATA_MEMORY_SIZE-1) of unsigned (31 downto 0);\n\n"
     result += '    constant data_memory_c: data_memory_t := (\n\n'
-    
-    # TODO: Write data to result.
+
+    if len(data) % 32 != 0:
+        data.extend([False]*(32 - (len(data) % 32)))
+
+    for i in range(len(data) // 32):
+        result += '        b"'
+        delimiter=''
+
+        for j in range(4):
+            result += f'{delimiter}{data[(i*32 + j*8):(i*32 + j*8 + 7)].to01()}'
+            delimiter = '_'
+
+        result += '",\n'
 
     result += "        others => (others => '0')\n    );\nend data;\n"
     return result

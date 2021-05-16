@@ -26,10 +26,20 @@ class Instruction:
     def __repr__(self):
         return str(self.__dict__)
 
+class Data:
+    def __init__(self, value, size):
+        self.value = value
+        self.size = size
+
+    def __repr__(self):
+        return str(self.__dict__)
+
 class InstructionParser:
     def __init__(self):
         self.pc = 0
+        self.data = []
         self.labels = {}
+        self.data_labels = {}
         self.aliases = dict(ALIASES)
         self.constants = dict(CONSTANTS)
         self.instructions = []
@@ -92,12 +102,30 @@ class InstructionParser:
         elif directive == DIRECTIVE_ALIAS:
             self.aliases[key.lower().strip()] = value.strip()
         elif directive == DIRECTIVE_DATA:
-            pass
+            name, value = value.split(' ', 1)
+
+            if key == DIRECTIVE_DATA_BYTE:
+                data = Data(value, 8)
+                self.data.append(data)
+                self.data_labels[name] = len(self.data) - 1
+            elif key == DIRECTIVE_DATA_WORD:
+                data = Data(value, 32)
+                self.data.append(data)
+                self.data_labels[name] = len(self.data) - 1
+            elif key == DIRECTIVE_DATA_EXTERNAL:
+                with open(value[1:-1], 'rb') as ext:
+                    bytes = bytearray(ext.read())
+                    self.data_labels[name] = len(self.data)
+
+                    for byte in bytes:
+                        self.data.append(Data(f'{byte}', 8))
+            else:
+                raise ParseException(f'Unknown data directive: {key}')
         else:
-            raise ParseException(f'Unknown directive: {line}')
+            raise ParseException(f'Unknown directive: {directive}')
 
         return True
-            
+
     def instruction(self, op, index, line, source_line):
         if not op:
             return None

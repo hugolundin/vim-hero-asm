@@ -50,7 +50,7 @@ if __name__ == '__main__':
 
                 if len(data) > 0:
                     with open('data.vhd', 'w') as output:
-                        output.write(vhdl.generate_data(data))
+                        output.write(vhdl.generate_data(assembler.parser, data))
             else:
                 with open(program_destination, 'wb') as output:
                     output.write(program.tobytes())

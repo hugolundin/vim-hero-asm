@@ -29,8 +29,15 @@ class Assembler:
     def assemble(self):
         lines = self.load(self.path)
         self.parser.parse(lines)
+
+        # First pass. Build resulting data file. 
+        if len(self.parser.data) > 0:
+            for data in self.parser.data:
+                value = simple_eval(data.value)
+                binary = int2ba(value, length=data.size, endian='big', signed=True if value < 0 else False)
+                self.data.extend(binary)
         
-        # First pass. Resolve pseudo instructions.
+        # Second pass. Resolve pseudo instructions.
         # To limit the scope of this project, only
         # instructions of equal length can be pseudoed. 
         for index, instruction in enumerate(self.parser.instructions):
@@ -46,7 +53,7 @@ class Assembler:
                 self.parser.instructions[index] = Instruction(
                     'jmpi', instruction.line, ['718'])
 
-        # Second pass. Assemble instructions.
+        # Third pass. Assemble instructions.
         for index, instruction in enumerate(self.parser.instructions):
             definition = get_instr_def(INSTRUCTIONS, instruction.name)
 
