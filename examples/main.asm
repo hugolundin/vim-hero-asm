@@ -8,3 +8,4 @@
 .data hej 0xFF
 .data yolo "song.dat"
 .data nope 0
+.data wazza 0xFFFFFFFF
