@@ -7,9 +7,6 @@ package program is
 
     constant program_c: program_t := (
 
-        -- 0: addi r1, r2, 5
-        b"001011_00001_00010_0000000000000101",
-
         others => (others => '0')
     );
 end program;

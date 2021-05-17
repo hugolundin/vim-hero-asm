@@ -17,7 +17,8 @@ class Assembler:
     def __init__(self, path):
         self.pc = 0
         self.parser = InstructionParser()
-        self.result = bitarray()
+        self.data = bitarray()
+        self.program = bitarray()
         self.path = os.path.abspath(path)
 
     @staticmethod
@@ -25,11 +26,18 @@ class Assembler:
         with open(path, 'r') as s:
             return [line.strip() for line in s.read().split('\n')]
 
-    def assemble(self) -> bytes:
+    def assemble(self):
         lines = self.load(self.path)
         self.parser.parse(lines)
+
+        # First pass. Build resulting data file. 
+        if len(self.parser.data) > 0:
+            for data in self.parser.data:
+                value = simple_eval(data)
+                binary = int2ba(value, length=32, endian='big', signed=True if value < 0 else False)
+                self.data.extend(binary)
         
-        # First pass. Resolve pseudo instructions.
+        # Second pass. Resolve pseudo instructions.
         # To limit the scope of this project, only
         # instructions of equal length can be pseudoed. 
         for index, instruction in enumerate(self.parser.instructions):
@@ -45,7 +53,7 @@ class Assembler:
                 self.parser.instructions[index] = Instruction(
                     'jmpi', instruction.line, ['718'])
 
-        # Second pass. Assemble instructions.
+        # Third pass. Assemble instructions.
         for index, instruction in enumerate(self.parser.instructions):
             definition = get_instr_def(INSTRUCTIONS, instruction.name)
 
@@ -70,13 +78,14 @@ class Assembler:
 
             self.pc += 1
 
-        return self.result
+        return self.program, self.data
 
     def instruction(self, instruction, definition):
         index = 0
         result = bitarray(definition['opcode'])
         
         for d in definition['format']:
+
             if d == REG:
                 self.reg(instruction, index, result)
                 index += 1
@@ -97,7 +106,7 @@ class Assembler:
 
         padding = INSTRUCTION_LEN - len(result)
         result.extend('0' * padding) 
-        self.result.extend(result)
+        self.program.extend(result)
 
     def reg(self, instruction, index, result):
         try:
@@ -122,21 +131,13 @@ class Assembler:
 
         if imm.lower() in self.parser.constants:
             imm = f'{self.parser.constants[imm.lower()]}'
-        elif imm.lower() in self.parser.labels:            
+
+        elif imm.lower() in self.parser.labels:           
             if get_instr_def(RELATIVE_BRANCH_INSTRUCTIONS, instruction.name):
                 imm = f'{self.parser.labels[imm.lower()] - self.pc - 1}'
             else:
                 imm = f'{self.parser.labels[imm.lower()]}'
 
-        if imm[0] == 'b':
-            binary = Bits(bin=imm[2:-1]).int
-            value = simple_eval(f'{binary}')
-        elif imm[0] == 'x':
-            hexadecimal = Bits(hex=imm[2:-1].int)
-            value = simple_eval(f'{binary}')
-        else:
-            value = simple_eval(imm)
-
-        signed = True if value < 0 else False
-        binary = int2ba(value, length=size, endian='big', signed=signed)
+        value = simple_eval(imm)
+        binary = int2ba(value, length=size, endian='big', signed=True if value < 0 else False)
         result.extend(binary)

@@ -1,5 +1,6 @@
 from architecture import get_instr_def, REG, IMM11, IMM16, IMM26, PAD5, INSTRUCTIONS
 import inspect
+import textwrap
 
 def format_args(args):
     result = ''
@@ -18,7 +19,7 @@ def get_line_name(parser, index):
 
     return f'{index}'
 
-def from_data(parser, data):
+def generate_program(parser, data):
     result = inspect.cleandoc("""
     library ieee;
     use ieee.std_logic_1164.all;
@@ -61,4 +62,36 @@ def from_data(parser, data):
         result += f'",\n\n'
 
     result += "        others => (others => '0')\n    );\nend program;\n"
+    return result
+
+def get_index_name(parser, index):
+    for label, line in parser.labels.items():
+        if line == index:
+            return f'{index} [{label.upper()}]'
+
+    return f'{index}'
+
+def generate_data(parser, data):
+    result = inspect.cleandoc("""
+    library ieee;
+    use ieee.std_logic_1164.all;
+    use ieee.numeric_std.all;
+
+    package data is
+    """)
+
+    result += "\n    type data_memory_t is array(0 to DATA_MEMORY_SIZE-1) of unsigned (31 downto 0);\n\n"
+    result += '    constant data_memory_c: data_memory_t := (\n\n'
+    
+    for index, word in enumerate(textwrap.wrap(data.to01(), 32)):
+        bytes = textwrap.wrap(word, 8)
+
+        result += f'        -- {get_index_name(parser, index)}: {parser.data[index]}\n'
+        result += f'        b"{bytes[0]}'
+        result += f'_{bytes[1]}'
+        result += f'_{bytes[2]}'
+        result += f'_{bytes[3]}'
+        result += '",\n\n'
+
+    result += "        others => (others => '0')\n    );\nend data;\n"
     return result

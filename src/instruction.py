@@ -1,3 +1,5 @@
+from bitarray import bitarray
+
 from architecture import ALIASES, CONSTANTS
 
 class InstructionException(Exception):
@@ -6,6 +8,11 @@ class InstructionException(Exception):
 class ParseException(Exception):
     """Raised when an error occurs while tokenizing."""
     pass
+
+TOKEN_COMMENT = ';'
+DIRECTIVE_DATA = 'data'
+DIRECTIVE_ALIAS = 'alias'
+DIRECTIVE_CONSTANT = 'constant'
 
 class Instruction:
     def __init__(self, name, line, args, source_line):
@@ -20,6 +27,7 @@ class Instruction:
 class InstructionParser:
     def __init__(self):
         self.pc = 0
+        self.data = []
         self.labels = {}
         self.aliases = dict(ALIASES)
         self.constants = dict(CONSTANTS)
@@ -70,26 +78,39 @@ class InstructionParser:
 
         dot, directive = op[0] == '.', op[1:]
 
-        # TODO: Raise exception.
         if not dot:
             return False
 
-        # TODO: Raise exception.
         if not directive:
-            return False
+            raise ParseException(f'Expected directive after ".": {line}')
 
-        if directive == 'constant':
-            key, value = line.split(' ', 1)
+        key, value = line.split(' ', 1)
+
+        if directive == DIRECTIVE_CONSTANT:
             self.constants[key.lower().strip()] = value.strip()
-            return True
-
-        if directive == 'alias':
-            key, value = line.split(' ', 1)
+        elif directive == DIRECTIVE_ALIAS:
             self.aliases[key.lower().strip()] = value.strip()
-            return True
+        elif directive == DIRECTIVE_DATA:
 
-        # TODO: Raise exception. 
-        return False
+            if value.startswith('"'):
+                with open(value[1:-1], 'rb') as ext:
+                    b = bitarray()
+                    b.frombytes(ext.read())
+
+                    if len(b) % 32 != 0:
+                        b.extend([False]*(32 - (len(b) % 32)))
+                    
+                    for i in range(len(b) // 32):
+                        self.data.append(f'0b{b[i * 32:(i + 1) * 32].to01()}')
+
+                    self.labels[key] = len(self.data) - 1 
+            else:
+                self.data.append(value)
+                self.labels[key] = len(self.data) - 1
+        else:
+            raise ParseException(f'Unknown directive: {directive}')
+
+        return True
 
     def instruction(self, op, index, line, source_line):
         if not op:
@@ -104,7 +125,7 @@ class InstructionParser:
         if not line:
             return None
 
-        s = line.split('#', 1)
+        s = line.split(TOKEN_COMMENT, 1)
 
         if len(s) > 1:
             return s[0]
