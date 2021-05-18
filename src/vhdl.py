@@ -80,6 +80,7 @@ def generate_data(parser, data):
     package data is
     """)
 
+    result += "\n    constant DATA_MEMORY_SIZE: integer := 1024;\n"
     result += "\n    type data_memory_t is array(0 to DATA_MEMORY_SIZE-1) of unsigned (31 downto 0);\n\n"
     result += '    constant data_memory_c: data_memory_t := (\n\n'
     
