@@ -137,7 +137,7 @@ CONSTANTS = {
     'keyboard_address'                  : f'{IO_BASE_ADDR + 1}',
     'sound_address'                     : f'{IO_BASE_ADDR + 2}',
     'buttons_pressed_address'           : f'{IO_BASE_ADDR + 3}',
-    'vga_score_address'                 : f'{IO_BASE_ADDR + 4}',
+    'score_add_address'                 : f'{IO_BASE_ADDR + 4}',
     'sprite_register_tick_address'      : f'{IO_BASE_ADDR + 5}',
     'sprite_register_data_address'      : f'{IO_BASE_ADDR + 6}',
     'sprite_register_notes_hit_address' : f'{IO_BASE_ADDR + 7}',
