@@ -140,5 +140,6 @@ CONSTANTS = {
     'vga_score_address'                 : f'{IO_BASE_ADDR + 4}',
     'sprite_register_tick_address'      : f'{IO_BASE_ADDR + 5}',
     'sprite_register_data_address'      : f'{IO_BASE_ADDR + 6}',
-    'sprite_register_notes_hit_address' : f'{IO_BASE_ADDR + 7}'
+    'sprite_register_notes_hit_address' : f'{IO_BASE_ADDR + 7}',
+    'tick_address'                      : f'{IO_BASE_ADDR + 8}'
 }
