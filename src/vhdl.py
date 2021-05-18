@@ -65,7 +65,7 @@ def generate_program(parser, data):
     return result
 
 def get_index_name(parser, index):
-    for label, line in parser.data_labels.items():
+    for label, line in parser.labels.items():
         if line == index:
             return f'{index} [{label.upper()}]'
 

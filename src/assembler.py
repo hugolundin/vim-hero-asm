@@ -132,8 +132,7 @@ class Assembler:
         if imm.lower() in self.parser.constants:
             imm = f'{self.parser.constants[imm.lower()]}'
 
-        elif imm.lower() in self.parser.labels:
-           
+        elif imm.lower() in self.parser.labels:           
             if get_instr_def(RELATIVE_BRANCH_INSTRUCTIONS, instruction.name):
                 imm = f'{self.parser.labels[imm.lower()] - self.pc - 1}'
             else:
