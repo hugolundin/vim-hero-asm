@@ -1,3 +1,4 @@
+from bitarray.util import int2ba
 
 REG   = 0
 IMM11 = 1
@@ -130,6 +131,8 @@ ALIASES = {
 }
 
 IO_BASE_ADDR = 1024
+TONE_LENGTH=8
+TONE_ENDIAN='big'
 
 CONSTANTS = {
     'henak'                             :  '718',
@@ -141,5 +144,96 @@ CONSTANTS = {
     'sprite_register_tick_address'      : f'{IO_BASE_ADDR + 5}',
     'sprite_register_data_address'      : f'{IO_BASE_ADDR + 6}',
     'sprite_register_notes_hit_address' : f'{IO_BASE_ADDR + 7}',
-    'tick_address'                      : f'{IO_BASE_ADDR + 8}'
+    'tick_address'                      : f'{IO_BASE_ADDR + 8}',
+    'silencio': f'0b{int2ba(0, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'c1': f'0b{int2ba(1, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'c#1': f'0b{int2ba(2, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'd1': f'0b{int2ba(3, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'd#1': f'0b{int2ba(4, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'e1': f'0b{int2ba(5, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'f1': f'0b{int2ba(6, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'f#1': f'0b{int2ba(7, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'g1': f'0b{int2ba(8, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'g#1': f'0b{int2ba(9, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'a1': f'0b{int2ba(10, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'a#1': f'0b{int2ba(1, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'b1': f'0b{int2ba(12, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+
+    'c2': f'0b{int2ba(13, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'c#2': f'0b{int2ba(1, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'd2': f'0b{int2ba(15, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'd#2': f'0b{int2ba(1, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'e2': f'0b{int2ba(17, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'f2': f'0b{int2ba(18, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'f#2': f'0b{int2ba(1, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'g2': f'0b{int2ba(20, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'g#2': f'0b{int2ba(2, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'a2': f'0b{int2ba(22, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'a#2': f'0b{int2ba(2, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'b2': f'0b{int2ba(24, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+
+    'c3': f'0b{int2ba(25, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'c#3': f'0b{int2ba(2, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'd3': f'0b{int2ba(27, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'd#3': f'0b{int2ba(2, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'e3': f'0b{int2ba(29, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'f3': f'0b{int2ba(30, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'f#3': f'0b{int2ba(3, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'g3': f'0b{int2ba(32, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'g#3': f'0b{int2ba(3, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'a3': f'0b{int2ba(34, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'a#3': f'0b{int2ba(3, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'b3': f'0b{int2ba(36, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    ''
+    'c4': f'0b{int2ba(37, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'c#4': f'0b{int2ba(3, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'd4': f'0b{int2ba(39, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'd#4': f'0b{int2ba(4, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'e4': f'0b{int2ba(41, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'f4': f'0b{int2ba(42, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'f#4': f'0b{int2ba(4, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'g4': f'0b{int2ba(44, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'g#4': f'0b{int2ba(4, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'a4': f'0b{int2ba(46, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'a#4': f'0b{int2ba(4, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'b4': f'0b{int2ba(48, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+
+    'c5': f'0b{int2ba(49, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'c#5': f'0b{int2ba(5, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'd5': f'0b{int2ba(51, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'd#5': f'0b{int2ba(5, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'e5': f'0b{int2ba(53, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'f5': f'0b{int2ba(54, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'f#5': f'0b{int2ba(5, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'g5': f'0b{int2ba(56, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'g#5': f'0b{int2ba(5, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'a5': f'0b{int2ba(58, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'a#5': f'0b{int2ba(5, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'b5': f'0b{int2ba(60, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+
+    'c6': f'0b{int2ba(61, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'c#6': f'0b{int2ba(6, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'd6': f'0b{int2ba(63, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'd#6': f'0b{int2ba(6, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'e6': f'0b{int2ba(65, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'f6': f'0b{int2ba(66, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'f#6': f'0b{int2ba(6, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'g6': f'0b{int2ba(68, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'g#6': f'0b{int2ba(6, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'a6': f'0b{int2ba(70, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'a#6': f'0b{int2ba(7, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'b6': f'0b{int2ba(72, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+
+    'c7': f'0b{int2ba(73, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'c#7': f'0b{int2ba(7, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'd7': f'0b{int2ba(75, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'd#7': f'0b{int2ba(7, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'e7': f'0b{int2ba(77, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'f7': f'0b{int2ba(78, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'f#7': f'0b{int2ba(7, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'g7': f'0b{int2ba(80, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'g#7': f'0b{int2ba(8, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'a7': f'0b{int2ba(82, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'a#7': f'0b{int2ba(8, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
+    'b7': f'0b{int2ba(84, length=TONE_LENGTH, endian=TONE_ENDIAN).to01()}',
 }

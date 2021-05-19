@@ -33,7 +33,10 @@ class Assembler:
         # First pass. Build resulting data file. 
         if len(self.parser.data) > 0:
             for data in self.parser.data:
-                value = simple_eval(data)
+                if data.lower() in self.parser.constants:
+                    data = f'{self.parser.constants[data.lower()]}'
+
+                value = simple_eval(data, names=self.parser.constants)
                 binary = int2ba(value, length=32, endian='big', signed=True if value < 0 else False)
                 self.data.extend(binary)
         
@@ -129,15 +132,15 @@ class Assembler:
         except IndexError:
             raise AssemblyException(f'{self.path}:{instruction.line}: missing argument')
 
-        if imm.lower() in self.parser.constants:
+        while imm.lower() in self.parser.constants:
             imm = f'{self.parser.constants[imm.lower()]}'
 
-        elif imm.lower() in self.parser.labels:           
+        while imm.lower() in self.parser.labels:           
             if get_instr_def(RELATIVE_BRANCH_INSTRUCTIONS, instruction.name):
                 imm = f'{self.parser.labels[imm.lower()] - self.pc - 1}'
             else:
                 imm = f'{self.parser.labels[imm.lower()]}'
 
-        value = simple_eval(imm)
+        value = simple_eval(imm, names=self.parser.constants|self.parser.labels)
         binary = int2ba(value, length=size, endian='big', signed=True if value < 0 else False)
         result.extend(binary)
