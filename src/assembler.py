@@ -1,4 +1,4 @@
-from architecture import REG, IMM11, IMM16, IMM26, PAD5, REGISTERS, INSTRUCTIONS, BRANCH_INSTRUCTIONS, RELATIVE_BRANCH_INSTRUCTIONS, get_instr_def
+from architecture import LOAD_STORE_INSTRUCTIONS, REG, IMM11, IMM16, IMM26, PAD5, REGISTERS, INSTRUCTIONS, BRANCH_INSTRUCTIONS, RELATIVE_BRANCH_INSTRUCTIONS, get_instr_def
 from utilities import info, warning, error
 from simpleeval import simple_eval
 from bitarray.util import int2ba
@@ -135,12 +135,14 @@ class Assembler:
         while imm.lower() in self.parser.constants:
             imm = f'{self.parser.constants[imm.lower()]}'
 
-        while imm.lower() in self.parser.labels:           
-            if get_instr_def(RELATIVE_BRANCH_INSTRUCTIONS, instruction.name):
+        while imm.lower() in self.parser.labels|self.parser.data_labels:
+            if get_instr_def(LOAD_STORE_INSTRUCTIONS, instruction.name):
+                imm = f'{self.parser.data_labels[imm.lower()] - self.pc - 1}'
+            elif get_instr_def(RELATIVE_BRANCH_INSTRUCTIONS, instruction.name):
                 imm = f'{self.parser.labels[imm.lower()] - self.pc - 1}'
             else:
                 imm = f'{self.parser.labels[imm.lower()]}'
 
-        value = simple_eval(imm, names=self.parser.constants|self.parser.labels)
+        value = simple_eval(imm, names=self.parser.constants|self.parser.labels|self.parser.data_labels)
         binary = int2ba(value, length=size, endian='big', signed=True if value < 0 else False)
         result.extend(binary)

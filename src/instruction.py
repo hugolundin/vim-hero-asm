@@ -29,6 +29,7 @@ class InstructionParser:
         self.pc = 0
         self.data = []
         self.labels = {}
+        self.data_labels = {}
         self.aliases = dict(ALIASES)
         self.constants = dict(CONSTANTS)
         self.instructions = []
@@ -94,6 +95,8 @@ class InstructionParser:
 
             if value.startswith('"'):
                 with open(value[1:-1], 'rb') as ext:
+                    self.data_labels[key] = len(self.data)
+
                     b = bitarray()
                     b.frombytes(ext.read())
 
@@ -102,11 +105,10 @@ class InstructionParser:
                     
                     for i in range(len(b) // 32):
                         self.data.append(f'0b{b[i * 32:(i + 1) * 32].to01()}')
-
-                    self.labels[key] = len(self.data) - 1 
+                    
             else:
                 self.data.append(value)
-                self.labels[key] = len(self.data) - 1
+                self.data_labels[key] = len(self.data) - 1
         else:
             raise ParseException(f'Unknown directive: {directive}')
 
