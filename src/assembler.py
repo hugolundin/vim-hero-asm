@@ -143,6 +143,7 @@ class Assembler:
             else:
                 imm = f'{self.parser.labels[imm.lower()]}'
 
-        value = simple_eval(imm, names=self.parser.constants|self.parser.labels|self.parser.data_labels)
+        value = int(simple_eval(imm.lower(), names=self.parser.constants|self.parser.labels|self.parser.data_labels))
+
         binary = int2ba(value, length=size, endian='big', signed=True if value < 0 else False)
         result.extend(binary)

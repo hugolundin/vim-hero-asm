@@ -95,7 +95,7 @@ class InstructionParser:
 
             if value.startswith('"'):
                 with open(value[1:-1], 'rb') as ext:
-                    self.data_labels[key] = len(self.data)
+                    self.data_labels[key.lower()] = len(self.data)
 
                     b = bitarray()
                     b.frombytes(ext.read())
@@ -108,7 +108,7 @@ class InstructionParser:
                     
             else:
                 self.data.append(value)
-                self.data_labels[key] = len(self.data) - 1
+                self.data_labels[key.lower()] = len(self.data) - 1
         else:
             raise ParseException(f'Unknown directive: {directive}')
 
