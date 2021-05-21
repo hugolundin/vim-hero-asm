@@ -84,6 +84,7 @@ class Assembler:
         return self.program, self.data
 
     def instruction(self, instruction, definition):
+
         index = 0
         result = bitarray(definition['opcode'])
         
@@ -137,11 +138,12 @@ class Assembler:
 
         while imm.lower() in self.parser.labels|self.parser.data_labels:
             if get_instr_def(LOAD_STORE_INSTRUCTIONS, instruction.name):
-                imm = f'{self.parser.data_labels[imm.lower()] - self.pc - 1}'
+                imm = f'{self.parser.data_labels[imm.lower()]}'
             elif get_instr_def(RELATIVE_BRANCH_INSTRUCTIONS, instruction.name):
                 imm = f'{self.parser.labels[imm.lower()] - self.pc - 1}'
             else:
                 imm = f'{self.parser.labels[imm.lower()]}'
+                
 
         value = int(simple_eval(imm.lower(), names=self.parser.constants|self.parser.labels|self.parser.data_labels))
 
