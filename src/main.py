@@ -27,6 +27,11 @@ if __name__ == '__main__':
         action='store_true')
 
     parser.add_argument(
+        '--program_memory',
+        help='Tell the assembler that we are in the program memory folder.',
+        action='store_true')
+
+    parser.add_argument(
         'file',
         help='File to assemble')
 
@@ -49,7 +54,7 @@ if __name__ == '__main__':
                     output.write(vhdl.generate_program(assembler.parser, program))
 
                 if len(data) > 0:
-                    with open('data.vhd', 'w') as output:
+                    with open('../data_controller/data.vhd', 'w') as output:
                         output.write(vhdl.generate_data(assembler.parser, data))
             else:
                 with open(program_destination, 'wb') as output:

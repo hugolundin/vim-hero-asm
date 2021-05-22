@@ -104,8 +104,7 @@ class InstructionParser:
                         b.extend([False]*(32 - (len(b) % 32)))
                     
                     for i in range(len(b) // 32):
-                        self.data.append(f'0b{b[i * 32:(i + 1) * 32].to01()}')
-                    
+                        self.data.append(f'0b{b[i * 32:(i + 1) * 32].to01()}')        
             else:
                 self.data.append(value)
                 self.data_labels[key.lower()] = len(self.data) - 1
